@@ -111,5 +111,5 @@ They use it to inspect suspicious activity, access patterns, and event history.
 
 
 ## HIGH LEVEL ARCHITECTURE
-
+![alt text](image.png)
 # High Throughput Log Aggregator
