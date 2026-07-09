@@ -86,7 +86,20 @@ Even if ingestion is fine, Grafana or your query API can become slow when the st
 <p> collect logs from one or more apps, move them through a scalable pipeline,buffer bursts,process them asynchronously,store them reliably,and visualize/search them later.
 
 ## USER STORY
+1. Developers
+They use it to find errors, trace requests, and debug bugs in services.
 
+2. DevOps / SRE engineers
+They use it to watch system health, detect failures, inspect spikes, and respond during incidents.
+
+3. QA / Test engineers
+They use it to verify behavior during testing and catch failures in test environments.
+
+4. System administrators / platform admins
+They use it to monitor infrastructure and check whether services are behaving normally.
+
+5. Security / audit teams
+They use it to inspect suspicious activity, access patterns, and event history.
 
 ## TRADITIONAL SOLUTION
 
