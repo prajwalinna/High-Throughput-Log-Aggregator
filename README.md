@@ -106,9 +106,19 @@ They use it to inspect suspicious activity, access patterns, and event history.
 
 ## TRADITIONAL SOLUTION
 
-
+![alt text](image-1.png)
 ## PROBLEMS WITH TRADITIONAL SOLUTION
+<li>Logs are scattered across different servers.
 
+<li>Engineers must SSH into each server to inspect logs.
+
+<li>Searching logs across multiple machines is slow and tedious.
+
+<li>During high traffic, disks fill up or the application slows down because it's writing logs synchronously.
+
+<li>No central place to search, filter, or visualize logs.
+
+<li>Difficult to correlate events across multiple microservices.
 
 ## PROPOSED SOLUTION
 
