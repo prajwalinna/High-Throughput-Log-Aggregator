@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # High-Throughput-Log-Aggregator
 
 
@@ -99,3 +100,6 @@ Even if ingestion is fine, Grafana or your query API can become slow when the st
 
 ## HIGH LEVEL ARCHITECTURE
 
+=======
+# High Throughput Log Aggregator
+>>>>>>> origin/main
