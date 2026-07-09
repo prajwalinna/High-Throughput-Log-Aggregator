@@ -109,6 +109,18 @@ They use it to inspect suspicious activity, access patterns, and event history.
 
 ## PROPOSED SOLUTION
 
+## Challenges in Designing a High-Throughput loggers for Logging
+
+<li><b>High Volume of Concurrent Requests:</b> The system needs to efficiently handle millions of requests per second.
+
+<li><b>Data Durability:</b> Events should never be lost, even in the event of system failures.
+
+<li><b>Scalability:</b> As traffic spikes, the system must scale seamlessly without manual intervention.
+
+<li><b>Performance:</b> The system should maintain low-latency for API responses and analytics queries.
+
+<li><b>Resilience:</b> The system must be resilient to partial failures (e.g., database issues or network timeouts).
+
 
 ## HIGH LEVEL ARCHITECTURE
 ![alt text](image.png)
