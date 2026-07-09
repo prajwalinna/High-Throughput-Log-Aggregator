@@ -4,6 +4,9 @@
 ### Wha is meant by High Throughput
 <p>High throughput means the system can handle a large number of log events per second continuously, not just in a short burst.
 
+### USE CASE
+During peak traffic, multiple microservices generate thousands of log events every second. The High Throughput Log Aggregator ingests, buffers, processes, and stores these logs in real time, enabling engineers to quickly search logs, detect failures, and troubleshoot issues without losing data.
+
 ### What is the that my laptop can handle
 
 
