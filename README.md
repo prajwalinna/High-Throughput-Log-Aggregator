@@ -137,4 +137,53 @@ They use it to inspect suspicious activity, access patterns, and event history.
 
 ## HIGH LEVEL ARCHITECTURE
 ![alt text](image.png)
+
+
+## Technical Requirements & Specifications
+
+This system is built around a decoupled, micro-batched architecture designed to minimize CPU overhead at the log producers and maximize write throughput at the storage layer. Below are the structural requirements and component specifications.
+
+### 1. Architecture Infrastructure Components
+* **Log Collection (Edge):** Vector / Fluent Bit (Sidecar/Daemon deployment)
+* **Message Buffer (Queue):** Apache Kafka / Redpanda 
+* **Data Processing Layer:** Custom Go Channels / Rust Tokio Workers
+* **Search & Indexing Engine:** OpenSearch / Elasticsearch
+* **Time-Series Columnar Analytics:** ClickHouse
+* **Visualization Layer:** Grafana
+
+---
+
+### 2. Component Resource Allocation Baselines
+
+| Component | CPU Profile | Memory (RAM) Target | Storage I/O Profile |
+| :--- | :--- | :--- | :--- |
+| **Log Collectors** | 0.1 – 0.5 vCPU | 50MB – 100MB | Minimal (Non-blocking disk buffer fallback) |
+| **Message Buffer** | 4 – 8 vCPUs | 16GB – 32GB | High Sequential Writes (OS Page Cache optimized) |
+| **Processing Workers**| 2 – 4 vCPUs | 1GB – 2GB | Stateless (Ephemeral network throughput) |
+| **Search Engine** | Heavy Multi-core | 32GB (16GB JVM Heap) | Ultra-High Random I/O (NVMe Recommended) |
+| **Analytics Database**| Compute-optimized| 16GB – 32GB | Heavy Columnar Compression (Standard SSD) |
+
+---
+
+### 3. Protocols, Runtimes, and OS Optimizations
+
+#### Kernel & Networking
+* **Zero-Copy Mechanism:** Requires Linux Kernel support for `sendfile()` system calls to streamline data transfer between network sockets and disk pages without user-space context switching.
+* **Transport Protocols:** Ingestion utilizes the native Kafka binary protocol over TCP; downstream persistence utilizes gRPC or the HTTP Bulk API.
+* **Compression Pipelines:** In-transit serialization enforced using high-speed **LZ4** or **Zstd** compression algorithms directly from the edge agent forward.
+
+#### Pipeline Performance Tuning
+* **Edge Ingestion Thresholds:** Micro-batching configured to flush payloads at either **1,000 discrete events** OR a **250ms** sliding timeout window.
+* **Database Bulk Injection:** Processing workers aggregate transformed, structured records into arrays of **5,000 to 10,000 lines** per singular database transaction.
+* **Concurrency Alignment:** The log-ingest Kafka topic partition count must equal or scale beyond the collective core capacity of active consumer workers to ensure horizontal scaling.
+
+---
+
+### 4. Local Development Environment Spec
+For rapid prototyping, isolated feature testing, and orchestration validation using Docker Compose, the local host machine must meet or exceed the following hardware baseline:
+
+* **Operating System:** Native Linux Environment (e.g., Ubuntu 24.04 LTS) for precise container network isolation and file descriptor allocation.
+* **Processor Architecture:** 4 to 6 Physical CPU Cores.
+* **System Memory:** 16GB RAM Minimum (Recommended allocation allocation: 2GB Kafka, 4GB OpenSearch, 2GB ClickHouse, remaining headroom reserved for local runtimes and Docker daemon execution).
+* **Disk Space:** Minimum 20GB free space partitioned on a solid-state drive (SSD).
 # High Throughput Log Aggregator
