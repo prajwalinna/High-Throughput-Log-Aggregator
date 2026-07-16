@@ -142,6 +142,8 @@ They use it to inspect suspicious activity, access patterns, and event history.
 ## Technical Requirements & Specifications
 
 This system is built around a decoupled, micro-batched architecture designed to minimize CPU overhead at the log producers and maximize write throughput at the storage layer. Below are the structural requirements and component specifications.
+<img width="1112" height="130" alt="image" src="https://github.com/user-attachments/assets/1351c23e-b03b-4909-8408-5e3a4a2d9965" />
+
 
 ### 1. Architecture Infrastructure Components
 * **Log Collection (Edge):** Vector / Fluent Bit (Sidecar/Daemon deployment)
