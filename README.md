@@ -198,4 +198,31 @@ For rapid prototyping, isolated feature testing, and orchestration validation us
 <p>The Kafka integration</p>
 
 ![alt text](image-3.png)
+
+## 📋 TODO — Next Week
+
+### Pipeline
+- [ ] Trigger the complete log aggregation flow automatically
+- [ ] Implement Kafka-based event trigger for log processing
+- [ ] Verify end-to-end flow: Fluent Bit → Kafka → Log Processor → S3
+
+### Log Processing & Storage
+- [ ] Process logs in batches from Kafka
+- [ ] Store compressed log batches in the S3 `log-aggregator-archive` bucket
+- [ ] Trigger processing when a new log batch arrives in S3
+- [ ] Summarize the logs stored in S3
+- [ ] Store generated summaries in a separate S3 `log-summary-archive` bucket
+
+### Reliability & Performance
+- [ ] Implement manual Kafka offset commits after successful S3 upload
+- [ ] Add batch flushing based on **size OR timeout**
+- [ ] Add retry handling for failed S3 uploads
+- [ ] Ensure Kafka topic is automatically created with 3 partitions
+- [ ] Fix Kafka/Floci startup readiness in Docker Compose
+
+### Testing
+- [ ] Generate high-volume test logs
+- [ ] Measure logs processed per second
+- [ ] Test multiple Kafka consumers using the same consumer group
+- [ ] Test recovery when Kafka, the consumer, or S3 temporarily fails
 # High Throughput Log Aggregator
