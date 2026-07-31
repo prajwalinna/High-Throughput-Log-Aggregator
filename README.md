@@ -188,4 +188,14 @@ For rapid prototyping, isolated feature testing, and orchestration validation us
 * **Processor Architecture:** 4 to 6 Physical CPU Cores.
 * **System Memory:** 16GB RAM Minimum (Recommended allocation allocation: 2GB Kafka, 4GB OpenSearch, 2GB ClickHouse, remaining headroom reserved for local runtimes and Docker daemon execution).
 * **Disk Space:** Minimum 20GB free space partitioned on a solid-state drive (SSD).
+<h2> Till 23/07/26
+<p>Till Now
+
+![Till Now](image-2.png)
+
+<h2>31/07/2026
+
+<p>The Kafka integration</p>
+
+![alt text](image-3.png)
 # High Throughput Log Aggregator
