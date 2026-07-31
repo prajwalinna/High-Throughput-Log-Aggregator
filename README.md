@@ -199,7 +199,7 @@ For rapid prototyping, isolated feature testing, and orchestration validation us
 
 ![alt text](image-3.png)
 
-## 📋 TODO — Next Week
+## TODO 
 
 ### Pipeline
 - [ ] Trigger the complete log aggregation flow automatically
