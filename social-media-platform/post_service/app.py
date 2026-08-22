@@ -4,11 +4,13 @@ import os
 import random
 import time
 import uuid
+import sys
 from datetime import datetime, timezone
 
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from shared.kafka_logger import KafkaFallbackHandler
+
 SERVICE_NAME = "post-service"
-LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
-LOG_FILE = os.path.join(LOG_DIR, "post.log")
 
 DEVICES = ["iPhone 15", "Samsung Galaxy S24", "Pixel 8", "MacBook Pro", "Windows PC", "iPad Air"]
 LOCATIONS = ["New York, US", "London, UK", "Tokyo, JP", "Berlin, DE", "Sydney, AU", "Toronto, CA"]
@@ -68,13 +70,11 @@ class JsonFormatter(logging.Formatter):
 
 
 def setup_logger() -> logging.Logger:
-    os.makedirs(LOG_DIR, exist_ok=True)
-
     logger = logging.getLogger(SERVICE_NAME)
     logger.setLevel(logging.DEBUG)
     logger.handlers.clear()
 
-    handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
+    handler = KafkaFallbackHandler(SERVICE_NAME)
     handler.setFormatter(JsonFormatter())
     logger.addHandler(handler)
 
@@ -121,6 +121,34 @@ def build_log_payload(level: str) -> tuple[str, dict]:
     return message, extra
 
 
+import math
+
+def get_sleep_time() -> float:
+    try:
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "traffic_config.json")
+        with open(config_path, "r") as f:
+            config = json.load(f)
+            throughput = config.get("throughput", "random")
+            
+            if throughput == "spike":
+                return random.uniform(0.001, 0.005)
+            elif throughput == "high":
+                return random.uniform(0.01, 0.05)
+            elif throughput == "medium":
+                return random.uniform(0.1, 0.5)
+            elif throughput == "low":
+                return random.uniform(1.0, 2.0)
+            else: # "random" simulates a wave pattern that spikes every minute
+                cycle = math.sin(time.time() / 10.0)
+                if cycle > 0.8:
+                    return random.uniform(0.001, 0.01) # Massive spike
+                elif cycle > 0:
+                    return random.uniform(0.05, 0.2) # Busy traffic
+                else:
+                    return random.uniform(1.0, 3.0) # Dead traffic (night time)
+    except Exception:
+        return random.uniform(1.0, 2.0)
+
 def run() -> None:
     logger = setup_logger()
     logger.info("Post service started", extra={"event": "SERVICE_STARTED", **base_metadata()})
@@ -136,8 +164,7 @@ def run() -> None:
         else:
             logger.error(message, extra=extra)
 
-        time.sleep(random.uniform(0.5, 2.0))
-
+        time.sleep(get_sleep_time())
 
 if __name__ == "__main__":
     run()

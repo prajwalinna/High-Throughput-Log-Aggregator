@@ -6,6 +6,6 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY consumer.py .
+COPY . .
 
-CMD ["python", "-u", "consumer.py"]
+# Command overridden in docker-compose.yml

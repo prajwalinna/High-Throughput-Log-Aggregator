@@ -1,0 +1,66 @@
+{
+  "title": "System Logs Dashboard",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Log Volume by Level",
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "datasource": "Loki",
+          "expr": "sum by(level) (count_over_time({consumer=\"storage\"}[$__interval]))",
+          "legendFormat": "{{level}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 30,
+            "spanNulls": false,
+            "insertNulls": false
+          },
+          "color": {
+            "mode": "field-by-name"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "ERROR": { "color": "red" },
+                "WARNING": { "color": "yellow" },
+                "INFO": { "color": "green" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "piechart",
+      "title": "Errors by Service",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "datasource": "Loki",
+          "expr": "sum by(service) (count_over_time({consumer=\"storage\", level=\"ERROR\"}[$__interval]))",
+          "legendFormat": "{{service}}"
+        }
+      ]
+    },
+    {
+      "type": "logs",
+      "title": "Live Logs Stream",
+      "gridPos": { "h": 15, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "datasource": "Loki",
+          "expr": "{consumer=\"storage\"}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 30,
+  "timezone": "browser",
+  "refresh": "5s"
+}

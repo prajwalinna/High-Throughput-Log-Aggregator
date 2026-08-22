@@ -1,0 +1,29 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: High Error Rate Alerts
+    folder: Logging Alerts
+    interval: 1m
+    rules:
+      - uid: high_error_rate_alert
+        title: High Error Rate Detected
+        condition: A
+        data:
+          - refId: A
+            datasourceUid: loki
+            model:
+              editorMode: builder
+              expr: sum(rate({level="ERROR"}[1m]))
+              queryType: range
+            relativeTimeRange:
+              from: 300
+              to: 0
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: High error rate detected in the microservices
+          description: "The system is generating a massive spike of ERROR logs. Traffic might be too high or a service is down."
+        labels:
+          severity: critical
