@@ -5,7 +5,7 @@ import random
 import time
 import uuid
 from datetime import datetime, timezone
-
+    
 SERVICE_NAME = "notification-service"
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
 LOG_FILE = os.path.join(LOG_DIR, "notification.log")

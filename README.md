@@ -226,3 +226,7 @@ For rapid prototyping, isolated feature testing, and orchestration validation us
 - [ ] Test multiple Kafka consumers using the same consumer group
 - [ ] Test recovery when Kafka, the consumer, or S3 temporarily fails
 # High Throughput Log Aggregator
+
+
+# Till above it was architecture 1 all the below things are the architecture-2
+![alt text](image-4.png)
