@@ -229,4 +229,4 @@ For rapid prototyping, isolated feature testing, and orchestration validation us
 
 
 # Till above it was architecture 1 all the below things are the architecture-2
-![alt text](image-4.png)
+![alt text](image-5.png)
