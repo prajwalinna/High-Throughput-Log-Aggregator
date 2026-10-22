@@ -24,6 +24,7 @@ def get_producer() -> KafkaProducer:
     try:
         return KafkaProducer(
             bootstrap_servers=[BROKER_URL],
+            api_version=(3, 5, 0),
             value_serializer=lambda v: json.dumps(v).encode("utf-8")
         )
     except Exception as e:

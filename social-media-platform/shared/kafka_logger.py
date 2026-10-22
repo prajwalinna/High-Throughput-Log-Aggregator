@@ -28,6 +28,7 @@ class KafkaFallbackHandler(logging.Handler):
         try:
             self.producer = KafkaProducer(
                 bootstrap_servers=[self.broker_url],
+                api_version=(3, 5, 0),
                 value_serializer=lambda v: json.dumps(v).encode("utf-8")
             )
             return True

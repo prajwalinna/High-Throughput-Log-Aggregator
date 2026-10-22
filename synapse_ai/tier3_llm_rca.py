@@ -89,6 +89,13 @@ class GenerativeLLMReasoner:
     def __init__(self, topology_path: Optional[str] = None):
         self.assembler = TopologyDossierAssembler(topology_path)
         self._incident_counter = 1000
+        try:
+            inc_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports", "incidents.json")
+            if os.path.exists(inc_file):
+                with open(inc_file, "r", encoding="utf-8") as f:
+                    self._incident_counter += len(json.load(f))
+        except Exception:
+            pass
 
     def analyze_incident(
         self,

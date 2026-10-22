@@ -144,12 +144,10 @@ def run_pipeline():
     # 1. Start Docker Kafka
     start_kafka_docker()
 
-    # 2. Start Background Traffic Generator
-    stop_event = threading.Event()
-    producer_thread = threading.Thread(target=start_traffic_producer, args=(stop_event,), daemon=True)
-    producer_thread.start()
+    # 2. Initialize 4-Tier AI Engine (CUDA Warmup)
+    pipeline = SynapsePipeline(device="cuda", tau_confident=0.45)
 
-    # 3. Connect Kafka Consumer
+    # 3. Connect Kafka Stream Consumer (Direct Topic Subscriber)
     print("[Consumer] Connecting to Kafka topic 'logs'...")
     consumer = None
     for attempt in range(15):
@@ -157,24 +155,25 @@ def run_pipeline():
             consumer = KafkaConsumer(
                 "logs",
                 bootstrap_servers=["localhost:9092"],
-                group_id="synapse-orchestrator-group",
+                api_version=(3, 5, 0),
                 auto_offset_reset="latest",
-                enable_auto_commit=True,
                 value_deserializer=lambda v: json.loads(v.decode("utf-8")),
                 consumer_timeout_ms=1000
             )
             print("[Consumer] Connected to Kafka stream successfully!")
             break
         except Exception as e:
-            time.sleep(1.5)
+            time.sleep(1.0)
 
     if not consumer:
         print("[Fatal] Could not connect to Kafka. Exiting.")
-        stop_event.set()
         return
 
-    # 4. Initialize 4-Tier AI Engine
-    pipeline = SynapsePipeline(device="cuda", tau_confident=0.45)
+    # 4. Start Background Microservice Traffic Generator
+    stop_event = threading.Event()
+    producer_thread = threading.Thread(target=start_traffic_producer, args=(stop_event,), daemon=True)
+    producer_thread.start()
+
     print("\n" + "=" * 75)
     print("  SYNAPSELOG AI ENGINE LIVE COCKPIT - PRESS CTRL+C TO STOP")
     print("=" * 75 + "\n")
@@ -184,7 +183,11 @@ def run_pipeline():
 
     try:
         while True:
-            records = consumer.poll(timeout_ms=500)
+            try:
+                records = consumer.poll(timeout_ms=250)
+            except Exception:
+                time.sleep(0.05)
+                continue
             for tp, msgs in records.items():
                 for msg in msgs:
                     raw_log = msg.value
