@@ -197,6 +197,8 @@ def run_pipeline():
                         continue
 
                     srv = raw_log.get("service", "unknown")
+                    msg_text = str(raw_log.get("message", "")).strip()
+                    clean_msg = (msg_text[:56] + "...") if len(msg_text) > 59 else msg_text
 
                     # Autonomous Circuit Breaker Protection:
                     # If on-call ignored 5 reminders, traffic for this service is automatically shed to protect the cluster
@@ -204,7 +206,7 @@ def run_pipeline():
                         logs_count += 1
                         pager.record_shed_log(srv)
                         if logs_count % 10 == 0:
-                            print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: SHED_BY_CIRCUIT_BREAKER      | Latency: 0.003 ms (Safe Fallback Active)")
+                            print(f"  Log #{logs_count:04d} | [{srv:18s}] SHED_BY_CIRCUIT_BREAKER     ( 0.003 ms) | Shed: \"{clean_msg}\" (Circuit Breaker Tripped)")
                         continue
 
                     logs_count += 1
@@ -218,6 +220,7 @@ def run_pipeline():
                         print(f"  Incident ID       : {res['incident_id']}")
                         print(f"  Focal Service     : {srv}")
                         print(f"  Root Cause        : {res['root_cause_summary']}")
+                        print(f"  Trigger Message   : \"{msg_text}\"")
                         print(f"  Blast Radius      : {res['blast_radius']}")
                         print(f"  Assigned Team     : {res['routing_target']} (Pager: {res['oncall_pager']})")
                         print(f"  Mitigation Action : {res['mitigation_steps'][0]}")
@@ -229,7 +232,7 @@ def run_pipeline():
 
                     elif verdict == "SUPPRESSED_ONGOING_INCIDENT":
                         if logs_count % 5 == 0:
-                            print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")
+                            print(f"  Log #{logs_count:04d} | [{srv:18s}] SUPPRESSED_ONGOING_INCIDENT ({lat:6.3f} ms) | Intercepted: \"{clean_msg}\"")
                         
                         # Continuous Failure Tracking & Autonomous Circuit Breaker (trips after 5 ignored reminders)
                         rem = pager.record_suppressed_failure(srv, res.get("transient_signature", f"{srv}::fault"))
@@ -255,11 +258,13 @@ def run_pipeline():
                                 print("#" * 75 + "\n")
 
                     elif verdict == "RESOLVED_BY_SLM_LOCALLY":
-                        print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")
+                        pred = res.get("predicted_class", "KNOWN_FAULT")
+                        conf = res.get("confidence", 0.0) * 100
+                        print(f"  Log #{logs_count:04d} | [{srv:18s}] RESOLVED_BY_SLM_LOCALLY    ({lat:6.3f} ms) | Solved: \"{clean_msg}\" [{pred} {conf:.1f}%]")
 
                     else: # PASS_TO_ARCHIVE
                         if logs_count % 10 == 0:
-                            print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")
+                            print(f"  Log #{logs_count:04d} | [{srv:18s}] PASS_TO_ARCHIVE             ({lat:6.3f} ms) | Event: \"{clean_msg}\"")
 
             # Periodic Status Banner every 12 seconds
             now = time.time()

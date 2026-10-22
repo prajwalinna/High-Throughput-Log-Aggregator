@@ -105,7 +105,8 @@ def run_stream_simulation():
         log = generate_normal_log(srv)
         res = pipeline.process_log(log)
         if i % 15 == 0:
-            print(f"  Log #{i:03d} | [{srv:20s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms")
+            msg = str(log.get('message', ''))[:45]
+            print(f"  Log #{i:03d} | [{srv:18s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms | Event: '{msg}...'")
 
     # -------------------------------------------------------------
     # PHASE 2: Known Operational Failure (Logs 41 to 70)
@@ -120,7 +121,8 @@ def run_stream_simulation():
         log = generate_known_fault_log(srv, step=(i - 40))
         res = pipeline.process_log(log)
         if i % 10 == 0:
-            print(f"  Log #{i:03d} | [{srv:20s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms")
+            msg = str(log.get('message', ''))[:45]
+            print(f"  Log #{i:03d} | [{srv:18s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms | Solved: '{msg}...'")
 
     # -------------------------------------------------------------
     # PHASE 3: Novel Zero-Day Failure Burst (Logs 71 to 110)
@@ -147,7 +149,8 @@ def run_stream_simulation():
             print(f"     Transient Sig     : {res['transient_signature']}")
             print(f"     Tier-4 Action     : Injected into Tier-1 Bloom filter for instant deduplication!\n")
         elif i % 10 == 0:
-            print(f"  Log #{i:03d} | [{srv:20s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms")
+            msg = str(log.get('message', ''))[:45]
+            print(f"  Log #{i:03d} | [{srv:18s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms | Intercepted: '{msg}...'")
 
     # -------------------------------------------------------------
     # PHASE 4: Recovery Traffic (Logs 111 to 140)
@@ -159,7 +162,8 @@ def run_stream_simulation():
         log = generate_normal_log(srv)
         res = pipeline.process_log(log)
         if i % 10 == 0:
-            print(f"  Log #{i:03d} | [{srv:20s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms")
+            msg = str(log.get('message', ''))[:45]
+            print(f"  Log #{i:03d} | [{srv:18s}] Verdict: {res['verdict']:25s} | Latency: {res['latency_ms']:.3f} ms | Event: '{msg}...'")
 
     # Final Telemetry Report
     report = pipeline.get_summary_report()
