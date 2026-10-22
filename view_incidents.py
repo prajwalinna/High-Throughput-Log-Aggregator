@@ -140,11 +140,50 @@ def test_pager():
     print("[Success] Dispatched Windows notification, sound alert, and recorded in pager outbox!")
 
 
+def print_circuit_status():
+    circuit_file = os.path.join(REPORTS_DIR, "circuit_breaker_status.json")
+    circuits = {}
+    if os.path.exists(circuit_file):
+        try:
+            with open(circuit_file, "r", encoding="utf-8") as f:
+                circuits = json.load(f)
+        except Exception:
+            circuits = {}
+
+    print("\n" + "=" * 95)
+    print("  SYNAPSELOG AUTONOMOUS CIRCUIT BREAKER & SERVICE ISOLATION STATUS")
+    print("=" * 95)
+    if not circuits:
+        print("  All microservices operating normally. Zero circuit breakers currently tripped.")
+    else:
+        print(f"{'Service':<22} | {'State':<12} | {'Tripped At':<20} | {'Shed Logs':<12} | {'Reason'}")
+        print("-" * 95)
+        for srv, info in circuits.items():
+            st = info.get("state", "UNKNOWN")
+            ts = info.get("tripped_at", "N/A")[:19]
+            shed = info.get("shed_logs_count", 0)
+            reason = info.get("trigger_reason", "N/A")
+            print(f"{srv:<22} | {st:<12} | {ts:<20} | {shed:<12} | {reason}")
+    print("=" * 95 + "\n")
+
+
+def reset_circuit(service: str):
+    from synapse_ai.pager_dispatcher import PagerDispatcher
+    dispatcher = PagerDispatcher()
+    if dispatcher.reset_circuit_breaker(service):
+        print(f"\n[Success] Circuit breaker for service '{service}' has been RESET!")
+        print(f"Normal traffic processing restored. Safe fallback mode deactivated.\n")
+    else:
+        print(f"\n[Notice] No active tripped circuit breaker found for service '{service}'.\n")
+
+
 def main():
     parser = argparse.ArgumentParser(description="SynapseLog Incident & Pager Inspector")
     parser.add_argument("--id", type=str, help="Specific Incident ID to inspect in detail")
     parser.add_argument("--pager", action="store_true", help="View autonomous on-call pager outbox & reminders")
     parser.add_argument("--ack", type=str, help="Acknowledge incident ID to silence continuous reminders")
+    parser.add_argument("--circuit-status", action="store_true", help="View autonomous circuit breaker isolation status")
+    parser.add_argument("--reset-circuit", type=str, help="Reset circuit breaker for a service (e.g. auth-service)")
     parser.add_argument("--test-pager", action="store_true", help="Test-fire on-call pager desktop alert & alarm")
     args = parser.parse_args()
 
@@ -152,6 +191,10 @@ def main():
         test_pager()
     elif args.ack:
         ack_incident(args.ack)
+    elif args.circuit_status:
+        print_circuit_status()
+    elif args.reset_circuit:
+        reset_circuit(args.reset_circuit)
     elif args.pager:
         print_pager_notifications()
     elif args.id:

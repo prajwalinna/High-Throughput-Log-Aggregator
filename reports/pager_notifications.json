@@ -18,5 +18,574 @@
     "failure_count": 1,
     "reminders_sent": 0,
     "last_reminder_time": 1792633495.821241
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:48:37Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792633717.7009194
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:49:07Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792633747.7006261
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:49:22Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 60,
+    "reminders_sent": 1
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:49:27Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 1020,
+    "reminders_sent": 1
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:49:47Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 90,
+    "reminders_sent": 2
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:49:48Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 2070,
+    "reminders_sent": 2
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:50:08Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 3120,
+    "reminders_sent": 3
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:50:28Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 4140,
+    "reminders_sent": 4
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:50:31Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 150,
+    "reminders_sent": 3
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:50:48Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 5160,
+    "reminders_sent": 5
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:50:57Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 180,
+    "reminders_sent": 4
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:51:09Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 6210,
+    "reminders_sent": 6
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:51:22Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 210,
+    "reminders_sent": 5
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:51:29Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 7230,
+    "reminders_sent": 7
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:51:50Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 8280,
+    "reminders_sent": 8
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-1007",
+    "timestamp": "2026-10-22T01:51:53Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Identity-and-Access-Management (IAM)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Database connection pool exhaustion on primary PostgreSQL cluster, causing auth worker threads to block.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::db_pool_exhaustion",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792633913.9071558
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:51:54Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 270,
+    "reminders_sent": 6
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:52:10Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 9300,
+    "reminders_sent": 9
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:52:14Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 1800,
+    "reminders_sent": 7
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:52:30Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 10320,
+    "reminders_sent": 10
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:52:34Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 3330,
+    "reminders_sent": 8
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:52:50Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 11340,
+    "reminders_sent": 11
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:52:55Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 4860,
+    "reminders_sent": 9
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:53:10Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 12360,
+    "reminders_sent": 12
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:53:15Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 6390,
+    "reminders_sent": 10
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:53:31Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 13380,
+    "reminders_sent": 13
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:53:35Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 7890,
+    "reminders_sent": 11
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:53:51Z",
+    "focal_service": "notification-service",
+    "assigned_team": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 14070,
+    "reminders_sent": 14
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-9999",
+    "timestamp": "2026-10-22T01:54:26Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Unclassified operational anomaly",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::test",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792634066.248503,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-9999",
+    "timestamp": "2026-10-22T01:55:33Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Unclassified operational anomaly",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::test",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792634133.1424742,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-TEST-9999",
+    "timestamp": "2026-10-22T01:56:28Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Identity-and-Access-Management (IAM)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Simulated on-call alert verification test.",
+    "blast_radius": [
+      "auth-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::test_alert",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792634188.6909864,
+    "circuit_breaker_tripped": false
   }
 ]

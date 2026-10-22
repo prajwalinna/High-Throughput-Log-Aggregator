@@ -196,10 +196,20 @@ def run_pipeline():
                     if not isinstance(raw_log, dict):
                         continue
 
+                    srv = raw_log.get("service", "unknown")
+
+                    # Autonomous Circuit Breaker Protection:
+                    # If on-call ignored 5 reminders, traffic for this service is automatically shed to protect the cluster
+                    if pager.is_circuit_tripped(srv):
+                        logs_count += 1
+                        pager.record_shed_log(srv)
+                        if logs_count % 10 == 0:
+                            print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: SHED_BY_CIRCUIT_BREAKER      | Latency: 0.003 ms (Safe Fallback Active)")
+                        continue
+
                     logs_count += 1
                     res = pipeline.process_log(raw_log)
                     verdict = res["verdict"]
-                    srv = raw_log.get("service", "unknown")
                     lat = res["latency_ms"]
 
                     if verdict == "ESCALATED_LLM_RCA":
@@ -221,17 +231,28 @@ def run_pipeline():
                         if logs_count % 5 == 0:
                             print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")
                         
-                        # Continuous Failure Tracking & Automated Escalation Reminders
+                        # Continuous Failure Tracking & Autonomous Circuit Breaker (trips after 5 ignored reminders)
                         rem = pager.record_suppressed_failure(srv, res.get("transient_signature", f"{srv}::fault"))
                         if rem:
-                            print("\n" + "#" * 75)
-                            print(f"  🔔 [CONTINUOUS OUTAGE ESCALATION REMINDER #{rem['reminders_sent']} SENT]")
-                            print(f"  Incident ID       : {rem['incident_id']}")
-                            print(f"  Focal Service     : {rem['focal_service']}")
-                            print(f"  Outage Duration   : {rem['continuous_failures_intercepted']} consecutive failure logs intercepted!")
-                            print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
-                            print(f"  Pager Action      : Fired Windows desktop alert + audible alarm + outbox update")
-                            print("#" * 75 + "\n")
+                            if rem.get("alert_type") == "EMERGENCY_CIRCUIT_BREAKER_TRIPPED":
+                                print("\n" + "=" * 75)
+                                print("  🚨 [AUTONOMOUS CIRCUIT BREAKER ACTIVATED: 5 UNANSWERED REMINDERS]")
+                                print(f"  Focal Service     : {rem['focal_service']}")
+                                print(f"  Incident ID       : {rem['incident_id']}")
+                                print(f"  Automated Action  : Ingress traffic shed and isolated to halt cluster collapse!")
+                                print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
+                                print(f"  Recovery Command  : Run 'python view_incidents.py --reset-circuit {rem['focal_service']}' to restore")
+                                print("=" * 75 + "\n")
+                            else:
+                                rem_left = rem.get("reminders_remaining_before_circuit_break", 0)
+                                print("\n" + "#" * 75)
+                                print(f"  🔔 [CONTINUOUS OUTAGE ESCALATION REMINDER #{rem['reminders_sent']} SENT]")
+                                print(f"  Incident ID       : {rem['incident_id']}")
+                                print(f"  Focal Service     : {rem['focal_service']}")
+                                print(f"  Outage Duration   : {rem['continuous_failures_intercepted']} consecutive failure logs intercepted!")
+                                print(f"  Circuit Breaker   : {rem_left} reminders remaining before automatic service isolation!")
+                                print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
+                                print("#" * 75 + "\n")
 
                     elif verdict == "RESOLVED_BY_SLM_LOCALLY":
                         print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")

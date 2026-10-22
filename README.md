@@ -3,57 +3,58 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.6.0%20CUDA-EE4C2C.svg)](https://pytorch.org/)
 [![Kafka](https://img.shields.io/badge/Apache%20Kafka-KRaft%20Mode-231F20.svg)](https://kafka.apache.org/)
-[![Target Venues](https://img.shields.io/badge/Target%20Conferences-USENIX%20ATC%20%7C%20ACM%20CCS%20%7C%20ICSE%20%7C%20IEEE%20S%26P-success.svg)](#)
+[![Target Venues](https://img.shields.io/badge/Target%20Conferences-USENIX%20ATC%20--%20ACM%20CCS%20--%20ICSE-success.svg)](#)
 
-> **SynapseLog** is a novel, high-throughput, closed-loop hierarchical AI pipeline designed for real-time log anomaly detection, epistemic uncertainty gating, causal root-cause analysis (RCA), and autonomous engineering team dispatch. Validated on canonical academic benchmarks (**LogHub BGL & HDFS**) and live microservice telemetry, SynapseLog achieves sub-millisecond median ingestion latencies (**$P50 = 0.018$ ms**), **92% anomaly recall**, and **>99% LLM token cost reduction**.
+> **SynapseLog** is a novel, high-throughput, closed-loop hierarchical AI pipeline designed for real-time log anomaly detection, epistemic uncertainty gating, causal root-cause analysis (RCA), and autonomous engineering team dispatch. Validated on canonical academic benchmarks (**LogHub BGL and HDFS**) and live microservice telemetry, SynapseLog achieves sub-millisecond median ingestion latencies (**P50 = 0.018 ms**), **92% anomaly recall**, and **>99% LLM token cost reduction**.
 
 ---
 
 ## 1. System Architecture & Information Flow
 
-SynapseLog replaces fragile monolithic parsers and economically unviable "raw log $\rightarrow$ LLM" cascades with a **4-Tier Hierarchical AI Architecture** backed by an active closed-loop distillation feedback loop.
+SynapseLog replaces fragile monolithic parsers and economically unviable "raw log to LLM" cascades with a **4-Tier Hierarchical AI Architecture** backed by an active closed-loop distillation feedback loop and an **Autonomous Circuit Breaker**.
 
 ### End-to-End Pipeline Workflow (Mermaid Diagram)
 
 ```mermaid
 flowchart TD
     subgraph INGESTION ["0. High-Throughput Ingestion Layer"]
-        S1["auth-service"] -->|JSON Logs| KAFKA[("Apache Kafka KRaft<br/>Topic: 'logs' :9092")]
-        S2["post-service"] -->|JSON Logs| KAFKA
-        S3["notification-service"] -->|JSON Logs| KAFKA
+        S1["auth-service"] -->|"JSON Logs"| KAFKA[("Apache Kafka KRaft (Port 9092)")]
+        S2["post-service"] -->|"JSON Logs"| KAFKA
+        S3["notification-service"] -->|"JSON Logs"| KAFKA
     end
 
-    subgraph TIER0 ["Tier-0: Stream Sessionizer & Masker"]
-        KAFKA -->|Continuous Stream| SES["Dynamic Token Masking<br/>(IPs, UUIDs, Hex, Timestamps)"]
-        SES --> WIN["Temporal Sliding Window<br/>(5s tumbling buffer / service)"]
+    subgraph TIER0 ["Tier-0: Stream Sessionizer and Masker"]
+        KAFKA -->|"Continuous Stream"| SES["Dynamic Token Masking (IPs, UUIDs, Hex)"]
+        SES --> WIN["Temporal Sliding Window (5s tumbling buffer)"]
     end
 
-    subgraph TIER1 ["Tier-1: Micro-Triage (<0.02 ms)"]
-        WIN --> BF{"Bloom Filter &<br/>Isolation Forest"}
-        BF -->|Routine Benign<br/>(65-98% of Stream)| ARCHIVE["Long-Term Archive<br/>(PASS_TO_ARCHIVE)"]
-        BF -->|Deterministic Fatal| P0["Instant Critical Alert<br/>(INSTANT_P0_ALERT)"]
-        BF -->|Syntactic Drift / Novelty| TIER2_ENTRY["Escalate Sequence"]
+    subgraph TIER1 ["Tier-1: Micro-Triage Sub-Millisecond"]
+        WIN --> BF{"Bloom Filter and Isolation Forest"}
+        BF -->|"Routine Benign (65-98% of Stream)"| ARCHIVE["Long-Term Archive (PASS_TO_ARCHIVE)"]
+        BF -->|"Deterministic Fatal"| P0["Instant Critical Alert (INSTANT_P0_ALERT)"]
+        BF -->|"Syntactic Drift or Novelty"| TIER2_ENTRY["Escalate Sequence"]
     end
 
     subgraph TIER2 ["Tier-2: Edge SLM with Epistemic Gating (CUDA)"]
-        TIER2_ENTRY --> SLM["Fine-Tuned DistilBERT (66M params)<br/>Hardware: Local GPU with CUDA"]
-        SLM --> UNC{"Epistemic Uncertainty Gating<br/>U(x) = α H(P) + (1-α)(1 - M)"}
-        UNC -->|Low Uncertainty U < 0.45<br/>Known Operational Fault| RESOLVE["Resolve Locally in ~6 ms<br/>(0 LLM Tokens Spent)"]
-        UNC -->|High Uncertainty U >= 0.45<br/>Novel Zero-Day Outage| TIER3_ENTRY["Escalate Incident"]
+        TIER2_ENTRY --> SLM["Fine-Tuned DistilBERT (66M params on CUDA)"]
+        SLM --> UNC{"Epistemic Uncertainty Gating U(x)"}
+        UNC -->|"Low Uncertainty (U &lt; 0.45)"| RESOLVE["Resolve Locally in ~6 ms (0 LLM Tokens)"]
+        UNC -->|"High Uncertainty (U &ge; 0.45)"| TIER3_ENTRY["Escalate Incident"]
     end
 
-    subgraph TIER3 ["Tier-3: Generative LLM RCA & Topology Dispatch"]
-        TIER3_ENTRY --> DOSSIER["Topological Dossier Assembler<br/>(Service Graph + Antecedent Logs)"]
+    subgraph TIER3 ["Tier-3: Generative LLM RCA and Autonomous Dispatch"]
+        TIER3_ENTRY --> DOSSIER["Topological Dossier Assembler"]
         DOSSIER --> LLM["Generative Causal Reasoner"]
-        LLM --> RCA["Causal Root Cause Diagnosis<br/>& Mitigation Playbook"]
-        LLM --> ROUTE["Autonomous Team Dispatch<br/>(IAM, DBA, Core Platform SRE)"]
-        LLM --> SIG["Synthesize Transient Signature<br/>(e.g., 'auth-service::raft_split_brain')"]
+        LLM --> RCA["Causal Root Cause Diagnosis and Mitigation Playbook"]
+        LLM --> ROUTE["Autonomous Team Dispatch (IAM, DBA, Core Platform SRE)"]
+        LLM --> SIG["Synthesize Transient Signature and 15m TTL"]
     end
 
-    subgraph TIER4 ["Tier-4: Active Distillation Feedback Loop"]
-        SIG -->|Closed-Loop Feedback| FEEDBACK["Active Prototype Feedback Engine"]
-        FEEDBACK -->|Inject Transient Signature<br/>TTL = 15 Minutes| BF
-        FEEDBACK -.->|Interception| SUPPRESS["Instant Storm Interception<br/>(SUPPRESSED_ONGOING_INCIDENT in 0.04 ms)"]
+    subgraph TIER4 ["Tier-4: Active Distillation and Circuit Breaker"]
+        SIG -->|"Closed-Loop Feedback"| FEEDBACK["Active Prototype Feedback Engine"]
+        FEEDBACK -->|"Inject Transient Signature"| BF
+        FEEDBACK -.->|"Interception"| SUPPRESS["Instant Storm Interception (<0.05 ms)"]
+        SUPPRESS -->|"5 Unresponsive Reminders"| CB["Autonomous Circuit Breaker (Traffic Shedding)"]
     end
 
     classDef primary fill:#1f77b4,stroke:#0d47a1,stroke-width:2px,color:#fff;
@@ -65,7 +66,7 @@ flowchart TD
     class KAFKA,SLM primary;
     class ARCHIVE,RESOLVE success;
     class BF,UNC warning;
-    class P0,TIER3_ENTRY,RCA danger;
+    class P0,TIER3_ENTRY,RCA,CB danger;
     class SES,WIN,DOSSIER,FEEDBACK neutral;
 ```
 
@@ -109,6 +110,11 @@ flowchart TD
                       * Injects Signature back into Tier-1 Bloom Filter
                       * Future burst logs suppressed in <0.05 ms
                       * 100% Repetitive Alert Suppression
+                                      |
+                                      v (If 5 Reminders Unanswered)
+                      [AUTONOMOUS CIRCUIT BREAKER FALLBACK]
+                      * Ingress traffic automatically shed (<0.003 ms)
+                      * Protects downstream services from cascading collapse
 ======================================================================================================
 ```
 
@@ -125,6 +131,7 @@ flowchart TD
 | **Tier-2 Edge SLM** | HuggingFace `distilbert-base-uncased` | 66M parameters fine-tuned with calibrated logits |
 | **Tier-3 Causal Reasoner** | Generative LLM + Service Topology | Causal RCA, blast radius calculation, on-call dispatch |
 | **Tier-4 Feedback** | Dynamic Bloom + In-Memory Cache | Sliding-window TTL deduplication |
+| **Autonomous Fallback** | Pager & Circuit Breaker Engine | Automated traffic shedding after 5 unanswered reminders |
 
 ---
 
@@ -132,13 +139,17 @@ flowchart TD
 
 Unlike naive cascaded systems that rely on raw softmax probabilities (which suffer from severe overconfidence on Out-Of-Distribution data), SynapseLog computes **Calibrated Epistemic Uncertainty $U(x)$** using temperature-scaled Shannon entropy and logit margin separation:
 
-$$P(y = c \mid x) = \frac{\exp\left(z_c / T\right)}{\sum_{j=1}^C \exp\left(z_j / T\right)}$$
+$$
+P(y = c \mid x) = \frac{\exp\left(z_c / T\right)}{\sum_{j=1}^C \exp\left(z_j / T\right)}
+$$
 
 where $T = 2.0$ is the conformal temperature parameter.
 
 The **Epistemic Uncertainty $U(x)$** is formulated as:
 
-$$U(x) = \alpha \cdot \frac{\mathcal{H}(P)}{\log C} + (1 - \alpha) \cdot \left(1 - \mathcal{M}_{\text{margin}}(P)\right)$$
+$$
+U(x) = \alpha \cdot \frac{\mathcal{H}(P)}{\log C} + (1 - \alpha) \cdot \left(1 - \mathcal{M}_{\text{margin}}(P)\right)
+$$
 
 where:
 * $\mathcal{H}(P) = -\sum_{c=1}^C P(y=c \mid x) \log P(y=c \mid x)$ is the **Shannon Entropy**.
@@ -146,10 +157,13 @@ where:
 * $\alpha = 0.5$ balances informational disorder with boundary ambiguity.
 
 **Decision Invariant:**
-$$\text{Verdict} = \begin{cases} 
+
+$$
+\text{Verdict} = \begin{cases} 
 \text{Resolve via Local SLM (Tier 2)} & \text{if } U(x) < \tau_{\text{confident}} \\ 
 \text{Escalate to Deep Generative RCA (Tier 3)} & \text{if } U(x) \ge \tau_{\text{confident}} 
-\end{cases}$$
+\end{cases}
+$$
 
 ---
 
@@ -204,28 +218,47 @@ python inject_fault.py --custom "Payment 504 Gateway Timeout" --service auth-ser
 
 ---
 
-### 3. Real-Time Incident Audit & Autonomous Pager Outbox
-Inspect diagnosed incidents, causal root causes, blast radiuses, on-call pager dispatches, and continuous failure reminders:
+### 3. Real-Time Incident Audit, Pager, & Circuit Breaker Inspector
+Inspect diagnosed incidents, causal root causes, blast radiuses, on-call pager dispatches, and circuit breaker status:
 ```powershell
-# View summary table of all recorded incidents:
+# 1. View summary table of all recorded incidents:
 python view_incidents.py
 
-# Inspect detailed causal dossier for a specific incident:
+# 2. Inspect detailed causal dossier for a specific incident:
 python view_incidents.py --id INC-2026-1002
 
-# View autonomous on-call pager outbox & continuous escalation reminders:
+# 3. View autonomous on-call pager outbox & continuous escalation reminders:
 python view_incidents.py --pager
 
-# Acknowledge an active incident (silences continuous reminders):
+# 4. Acknowledge an active incident (silences continuous reminders):
 python view_incidents.py --ack INC-2026-1002
 
-# Test-fire the pager (desktop notification toast + audible warning tone + outbox log):
+# 5. Check autonomous circuit breaker status (which services are isolated):
+python view_incidents.py --circuit-status
+
+# 6. Reset circuit breaker after fixing the bug (restores normal traffic):
+python view_incidents.py --reset-circuit auth-service
+
+# 7. Test-fire the pager (desktop notification toast + audible warning tone + outbox log):
 python view_incidents.py --test-pager
 ```
 
 ---
 
-### 4. Academic Benchmark Runner (LogHub Evaluation)
+### 4. What Happens During Continuous Failures? (Autonomous Circuit Breaker)
+
+When errors flow continuously and the on-call engineer does not respond:
+1. **Tier-4 Deduplication:** Intercepts burst error logs in `<0.05 ms`, preventing LLM flooding.
+2. **Escalation Reminders:** Fires reminders every 30–40 continuous intercepted logs with audible tones and Windows desktop pop-ups.
+3. **Autonomous Circuit Breaker (Fail-Safe at 5 Reminders):**
+   * If **5 escalation reminders** pass without acknowledgment, the system **automatically trips the circuit breaker** for the failing microservice.
+   * Ingress traffic for that service is shed into dead-letter safe fallback (`SHED_BY_CIRCUIT_BREAKER` in `<0.003 ms`).
+   * Downstream services are isolated, preventing cascading cluster death.
+   * Once resolved, run `python view_incidents.py --reset-circuit <service>` to restore normal traffic.
+
+---
+
+### 5. Academic Benchmark Runner (LogHub Evaluation)
 Run the automated academic evaluation benchmark on held-out LogHub supercomputer logs:
 ```powershell
 python -m evaluation.benchmark_runner
@@ -233,15 +266,15 @@ python -m evaluation.benchmark_runner
 
 ---
 
-### 5. Live Stream Simulation with Fault Cascades
-Execute the 4-phase standalone simulation (Normal $\rightarrow$ Known Fault $\rightarrow$ Novel Zero-Day Burst $\rightarrow$ Recovery):
+### 6. Live Stream Simulation with Fault Cascades
+Execute the 4-phase standalone simulation (Normal → Known Fault → Novel Zero-Day Burst → Recovery):
 ```powershell
 python -m evaluation.simulate_stream
 ```
 
 ---
 
-### 6. Local Model Re-Training & Calibration
+### 7. Local Model Re-Training & Calibration
 Re-train and calibrate the Tier-2 DistilBERT model locally with PyTorch CUDA:
 ```powershell
 python -m synapse_ai.train_slm
@@ -249,7 +282,7 @@ python -m synapse_ai.train_slm
 
 ---
 
-### 7. Clean Teardown & Resource Teardown
+### 8. Clean Teardown & Resource Teardown
 To safely stop Docker Kafka and release all memory and temporary files:
 ```bat
 .\clean_all.bat
@@ -271,6 +304,7 @@ High-Throughput-Log-Aggregator/
 │   ├── tier2_slm_gate.py          # DistilBERT SLM & Epistemic Uncertainty Gater
 │   ├── tier3_llm_rca.py           # Topology Dossier Assembler & Causal Reasoner
 │   ├── tier4_distillation.py      # Closed-Loop Prototype & Signature Feedback
+│   ├── pager_dispatcher.py        # Autonomous Pager & Self-Healing Circuit Breaker
 │   └── train_slm.py               # Local CUDA Fine-Tuning & Calibration Script
 ├── synapse_stream/                # Streaming & Sessionization
 │   └── sessionizer.py             # Regex Token Masking & Sliding Window Sessionizer
@@ -283,8 +317,12 @@ High-Throughput-Log-Aggregator/
 ├── social-media-platform/         # Simulated Microservice Telemetry Testbed
 │   ├── traffic_generator.py       # Multi-service Synthetic Traffic Generator
 │   └── shared/kafka_logger.py     # Fault-Tolerant Microservice Kafka Client
+├── config/                        # Operational Configuration
+│   └── pager_config.json          # Webhook URLs & Circuit Breaker Thresholds
 ├── reports/                       # Incident Dossiers & Audit Trails
-│   └── incidents.json             # Structured JSON Root Cause Analyses
+│   ├── incidents.json             # Structured JSON Root Cause Analyses
+│   ├── pager_notifications.json   # On-Call Pager Outbox Records
+│   └── circuit_breaker_status.json# Active Circuit Breaker State & Shed Counts
 ├── synapse_orchestrator.py        # Master Live Streaming Orchestrator
 ├── inject_fault.py                # On-Demand Chaos Fault & Traffic Injector
 ├── view_incidents.py              # CLI Incident & Dossier Audit Viewer
@@ -303,7 +341,7 @@ High-Throughput-Log-Aggregator/
 This codebase directly answers the five core Research Questions (**RQs**) required for top-tier systems publication:
 
 * **RQ1 (Detection Accuracy):** How effectively does conformal epistemic gating separate benign syntax drift from genuine operational anomalies compared to Drain and LogRobust?
-* **RQ2 (Throughput & Latency):** Can the hybrid CPU/CUDA micro-triage pipeline sustain $>50,000$ events/sec with sub-millisecond median latency?
+* **RQ2 (Throughput & Latency):** Can the hybrid CPU/CUDA micro-triage pipeline sustain >50,000 events/sec with sub-millisecond median latency?
 * **RQ3 (Token Economics):** What percentage of cloud LLM API cost is eliminated by resolving routine and known operational errors locally at Tier-2?
 * **RQ4 (RCA Grounding):** Does topological dossier assembly eliminate LLM hallucinations during root-cause diagnosis?
-* **RQ5 (Storm Suppression):** How effectively does Tier-4 active signature distillation suppress cascading alert storms during prolonged infrastructure outages?
+* **RQ5 (Storm Suppression & Resilience):** How effectively does Tier-4 active signature distillation and autonomous circuit breaking suppress cascading alert storms and protect cluster survivability?

@@ -123,5 +123,99 @@
       "masked_message": "Out of memory: Kill process <NUM> (worker) score <NUM> and sacrifice child; memory usage <NUM>.98GB<PATH>",
       "ingest_timestamp": 1792633026.9478629
     }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1005",
+    "timestamp": "2026-10-22T01:48:37Z",
+    "focal_service": "auth-service",
+    "root_cause_summary": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "routing_target": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "mitigation_steps": [
+      "Enforce Raft term step-down on isolated minority partition nodes",
+      "Quorum fence rogue leader node and trigger unforced reelection on majority partition",
+      "Verify network partition health across internal VPC peering links"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "latency_ms": 13.826800000970252,
+    "log": {
+      "timestamp": "2026-10-22T01:48:37Z",
+      "service": "auth-service",
+      "level": "FATAL",
+      "event": "ZERO_DAY_CONSENSUS_PANIC",
+      "message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "request_id": "1ef34462-11bf-4402-af69-d42d0489717f",
+      "response_time_ms": 3000,
+      "masked_message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "ingest_timestamp": 1792633717.6817985
+    }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1006",
+    "timestamp": "2026-10-22T01:49:07Z",
+    "focal_service": "notification-service",
+    "root_cause_summary": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "routing_target": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "mitigation_steps": [
+      "Apply memory limit override in Kubernetes deployment spec",
+      "Drain and rolling-restart affected service replicas"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "latency_ms": 7.721700007095933,
+    "log": {
+      "timestamp": "2026-10-22T01:49:07Z",
+      "service": "notification-service",
+      "level": "FATAL",
+      "event": "OOM_KILL",
+      "message": "Out of memory: Kill process 3000 (worker) score 950 and sacrifice child; memory usage 3.98GB/4.0GB",
+      "request_id": "7c199fe3-48aa-4de1-aa49-e69c1b07b7b5",
+      "memory_usage_mb": 3980,
+      "masked_message": "Out of memory: Kill process <NUM> (worker) score <NUM> and sacrifice child; memory usage <NUM>.98GB<PATH>",
+      "ingest_timestamp": 1792633747.6713316
+    }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1007",
+    "timestamp": "2026-10-22T01:51:53Z",
+    "focal_service": "auth-service",
+    "root_cause_summary": "Database connection pool exhaustion on primary PostgreSQL cluster, causing auth worker threads to block.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "routing_target": "Identity-and-Access-Management (IAM)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "mitigation_steps": [
+      "Scale connection pool max_connections by 50% via PgBouncer config",
+      "Restart hung auth-service worker pods to free orphaned socket handles"
+    ],
+    "transient_signature": "auth-service::db_pool_exhaustion",
+    "latency_ms": 10.93379999656463,
+    "log": {
+      "timestamp": "2026-10-22T01:51:53Z",
+      "service": "auth-service",
+      "level": "ERROR",
+      "event": "CUSTOM_FAULT",
+      "message": "Error , databse injecton successful",
+      "request_id": "aefdd6e5-a445-4b38-888c-fbf6f5a789df",
+      "masked_message": "Error , databse injecton successful",
+      "ingest_timestamp": 1792633913.8813584
+    }
   }
 ]
