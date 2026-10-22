@@ -1,0 +1,26 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+
+# Large Model Weights (exceeds GitHub 100MB file limit)
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+
+# Docker & Temporary Data
+floci-data/
+*.log
+social-media-platform/logs/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,32 @@
+# Microservice Topology & Team Ownership Graph for Causal RCA
+
+services:
+  auth-service:
+    team: "Identity-and-Access-Management (IAM)"
+    oncall_pager: "team-iam-alerts@company.internal"
+    dependencies: ["database-postgres", "redis-cache"]
+    criticality: "TIER-0"
+    common_failure_modes:
+      - "Database connection pool exhaustion"
+      - "JWT verification failure"
+      - "Redis rate-limiting timeout"
+
+  post-service:
+    team: "Core-Content-Platform"
+    oncall_pager: "team-content-alerts@company.internal"
+    dependencies: ["auth-service", "media-storage-s3", "database-postgres"]
+    criticality: "TIER-1"
+    common_failure_modes:
+      - "S3 upload timeout / permission denied"
+      - "Cascading retry storm to auth-service"
+      - "Serialization failure on post feed"
+
+  notification-service:
+    team: "Messaging-and-Engagement"
+    oncall_pager: "team-messaging-alerts@company.internal"
+    dependencies: ["post-service", "kafka-broker", "apns-gateway"]
+    criticality: "TIER-2"
+    common_failure_modes:
+      - "Kafka consumer lag backlog"
+      - "APNS push gateway connection reset"
+      - "Dead-letter queue threshold overflow"

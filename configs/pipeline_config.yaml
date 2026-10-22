@@ -1,0 +1,38 @@
+# SynapseLog Configuration
+
+pipeline:
+  name: "SynapseLog-Production"
+  kafka:
+    bootstrap_servers: ["localhost:9092"]
+    input_topic: "logs"
+    consumer_group: "synapse-triage-group"
+    auto_offset_reset: "latest"
+  
+  sessionizer:
+    window_duration_seconds: 5.0
+    slide_interval_seconds: 2.0
+    max_window_size: 50
+
+  tier1:
+    bloom_capacity: 100000
+    bloom_error_rate: 0.001
+    isolation_forest_contamination: 0.03
+    feature_dim: 16
+
+  tier2:
+    model_name: "models/tier2_slm_calibrated"
+    device: "cuda"  # NVIDIA GeForce RTX 2050
+    fp16: true
+    max_seq_length: 128
+    # Conformal Epistemic Gating
+    tau_confident: 0.45  # If uncertainty U(x) >= tau_confident, escalate to Tier-3
+    uncertainty_alpha: 0.5 # Balance between entropy and margin
+
+  tier3:
+    model_name: "gemini-flash" # Or local LLM / OpenAI API compatible
+    max_dossier_antecedents: 10
+    temperature: 0.1
+
+  tier4:
+    transient_bloom_ttl_seconds: 900 # 15 minutes
+    prototype_cache_capacity: 500
