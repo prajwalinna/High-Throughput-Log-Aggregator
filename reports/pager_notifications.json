@@ -1,0 +1,22 @@
+[
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-TEST-9999",
+    "timestamp": "2026-10-22T01:44:55Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Identity-and-Access-Management (IAM)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Simulated on-call alert verification test.",
+    "blast_radius": [
+      "auth-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::test_alert",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792633495.821241
+  }
+]

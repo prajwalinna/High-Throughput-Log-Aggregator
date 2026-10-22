@@ -204,14 +204,23 @@ python inject_fault.py --custom "Payment 504 Gateway Timeout" --service auth-ser
 
 ---
 
-### 3. Real-Time Incident Audit Inspector
-Inspect diagnosed incidents, causal root causes, blast radiuses, and remediation steps:
+### 3. Real-Time Incident Audit & Autonomous Pager Outbox
+Inspect diagnosed incidents, causal root causes, blast radiuses, on-call pager dispatches, and continuous failure reminders:
 ```powershell
 # View summary table of all recorded incidents:
 python view_incidents.py
 
 # Inspect detailed causal dossier for a specific incident:
 python view_incidents.py --id INC-2026-1002
+
+# View autonomous on-call pager outbox & continuous escalation reminders:
+python view_incidents.py --pager
+
+# Acknowledge an active incident (silences continuous reminders):
+python view_incidents.py --ack INC-2026-1002
+
+# Test-fire the pager (desktop notification toast + audible warning tone + outbox log):
+python view_incidents.py --test-pager
 ```
 
 ---

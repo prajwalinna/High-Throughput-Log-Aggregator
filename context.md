@@ -132,12 +132,23 @@ python inject_fault.py --traffic spike --count 200
 python inject_fault.py --custom "Payment Gateway timeout 504 on Stripe webhook" --service auth-service --level ERROR
 ```
 
-### Option D: Audit & Inspect Diagnosed Incidents
-To review what happened, the causal root causes, blast radius, and mitigation steps:
+### Option D: Audit & Inspect Diagnosed Incidents & Autonomous Pager Outbox
+To review what happened, the causal root causes, blast radius, mitigation steps, and on-call pager dispatches:
 ```powershell
+# 1. View all recorded incident dossiers:
 python view_incidents.py
-# Or inspect specific incident ID:
-python view_incidents.py --id INC-2026-1001
+
+# 2. Inspect a specific incident ID:
+python view_incidents.py --id INC-2026-1002
+
+# 3. View autonomous on-call pager outbox & escalation reminders:
+python view_incidents.py --pager
+
+# 4. Acknowledge an incident to silence continuous reminders:
+python view_incidents.py --ack INC-2026-1002
+
+# 5. Test-fire the pager (desktop toast, audible alert tone, outbox log):
+python view_incidents.py --test-pager
 ```
 
 ### Option E: Full System Cleanup & Resource Teardown
@@ -171,3 +182,6 @@ To target top-tier venues (USENIX ATC, ACM CCS, ICSE, FSE, IEEE S&P), the paper 
    * Novel Zero-Day faults (such as Raft consensus partition / quorum split-brain) are now cleanly isolated and assigned to `Platform-Core-Infrastructure (Infra & SRE)`, while database connection pool exhaustion is dispatched to the database SRE team with dedicated PgBouncer scaling actions.
 3. **Incident Audit Inspector (`view_incidents.py`):**
    * Enhanced with flexible dictionary key fallbacks so all diagnosed incidents display exact timestamps, focal services, blast radiuses, and mitigation steps both in the summary table and single-incident deep-dive view (`python view_incidents.py --id <INC_ID>`).
+4. **Autonomous Pager & Continuous Failure Reminder Engine (`synapse_ai/pager_dispatcher.py`):**
+   * Automatically pages responsible engineering teams (IAM, DBA, Core Platform SRE) via native Windows Desktop notifications, audible alarm tones, and configurable Slack/Discord/Teams webhooks (`config/pager_config.json`).
+   * When an outage continues failing without resolution, the engine tracks continuous intercepted failure logs and automatically fires **Continuous Escalation Reminders** every 30-50 intercepted failure logs to alert secondary on-call SRE leads. Engineers can silence reminders upon acknowledgment via `python view_incidents.py --ack <INC_ID>`.

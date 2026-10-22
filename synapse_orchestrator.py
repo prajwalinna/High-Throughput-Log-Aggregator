@@ -28,6 +28,7 @@ if SMP_DIR not in sys.path:
     sys.path.insert(0, SMP_DIR)
 
 from synapse_ai.pipeline_orchestrator import SynapsePipeline
+from synapse_ai.pager_dispatcher import PagerDispatcher
 from traffic_generator import MicroserviceTrafficEngine
 from kafka import KafkaConsumer, KafkaProducer
 
@@ -144,8 +145,9 @@ def run_pipeline():
     # 1. Start Docker Kafka
     start_kafka_docker()
 
-    # 2. Initialize 4-Tier AI Engine (CUDA Warmup)
+    # 2. Initialize 4-Tier AI Engine & Pager Dispatcher (CUDA Warmup)
     pipeline = SynapsePipeline(device="cuda", tau_confident=0.45)
+    pager = PagerDispatcher(reminder_interval_logs=30, reminder_cooldown_sec=20.0)
 
     # 3. Connect Kafka Stream Consumer (Direct Topic Subscriber)
     print("[Consumer] Connecting to Kafka topic 'logs'...")
@@ -213,10 +215,23 @@ def run_pipeline():
                         print(f"  Tier-4 Action     : Injected Bloom suppression (Duplicate filter active)!")
                         print("!" * 75 + "\n")
                         log_incident_report(res)
+                        pager.trigger_incident_alert(res)
 
                     elif verdict == "SUPPRESSED_ONGOING_INCIDENT":
                         if logs_count % 5 == 0:
                             print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")
+                        
+                        # Continuous Failure Tracking & Automated Escalation Reminders
+                        rem = pager.record_suppressed_failure(srv, res.get("transient_signature", f"{srv}::fault"))
+                        if rem:
+                            print("\n" + "#" * 75)
+                            print(f"  🔔 [CONTINUOUS OUTAGE ESCALATION REMINDER #{rem['reminders_sent']} SENT]")
+                            print(f"  Incident ID       : {rem['incident_id']}")
+                            print(f"  Focal Service     : {rem['focal_service']}")
+                            print(f"  Outage Duration   : {rem['continuous_failures_intercepted']} consecutive failure logs intercepted!")
+                            print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
+                            print(f"  Pager Action      : Fired Windows desktop alert + audible alarm + outbox update")
+                            print("#" * 75 + "\n")
 
                     elif verdict == "RESOLVED_BY_SLM_LOCALLY":
                         print(f"  Log #{logs_count:04d} | [{srv:20s}] Verdict: {verdict:28s} | Latency: {lat:.3f} ms")

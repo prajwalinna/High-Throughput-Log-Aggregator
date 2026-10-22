@@ -1,0 +1,20 @@
+{
+  "_comment": "Configure incoming webhooks to receive real-time incident alerts and continuous outage reminders.",
+  "webhook_url": "",
+  "notification_channels": {
+    "desktop_toast_enabled": true,
+    "audible_alarm_enabled": true,
+    "webhook_enabled": true,
+    "outbox_log_enabled": true
+  },
+  "escalation_policy": {
+    "continuous_failure_threshold_logs": 30,
+    "reminder_cooldown_seconds": 20.0,
+    "pager_targets": {
+      "auth-service": "team-iam-alerts@company.internal",
+      "post-service": "team-content-alerts@company.internal",
+      "notification-service": "team-messaging-alerts@company.internal",
+      "platform-infrastructure": "sre-oncall@company.internal"
+    }
+  }
+}

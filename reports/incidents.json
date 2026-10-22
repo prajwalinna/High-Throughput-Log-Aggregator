@@ -60,5 +60,68 @@
       "masked_message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
       "ingest_timestamp": 1792632819.7085586
     }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1003",
+    "timestamp": "2026-10-22T01:36:28Z",
+    "focal_service": "auth-service",
+    "root_cause_summary": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "routing_target": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "mitigation_steps": [
+      "Enforce Raft term step-down on isolated minority partition nodes",
+      "Quorum fence rogue leader node and trigger unforced reelection on majority partition",
+      "Verify network partition health across internal VPC peering links"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "latency_ms": 13.16699999733828,
+    "log": {
+      "timestamp": "2026-10-22T01:36:28Z",
+      "service": "auth-service",
+      "level": "FATAL",
+      "event": "ZERO_DAY_CONSENSUS_PANIC",
+      "message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "request_id": "31bf33c5-12e3-446c-8e92-793c74614255",
+      "response_time_ms": 3000,
+      "masked_message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "ingest_timestamp": 1792632988.9626594
+    }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1004",
+    "timestamp": "2026-10-22T01:37:06Z",
+    "focal_service": "notification-service",
+    "root_cause_summary": "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer.",
+    "blast_radius": [
+      "notification-service"
+    ],
+    "routing_target": "Messaging-and-Engagement",
+    "oncall_pager": "team-messaging-alerts@company.internal",
+    "mitigation_steps": [
+      "Apply memory limit override in Kubernetes deployment spec",
+      "Drain and rolling-restart affected service replicas"
+    ],
+    "transient_signature": "notification-service::oom_leak",
+    "latency_ms": 19.755900000745896,
+    "log": {
+      "timestamp": "2026-10-22T01:37:06Z",
+      "service": "notification-service",
+      "level": "FATAL",
+      "event": "OOM_KILL",
+      "message": "Out of memory: Kill process 3000 (worker) score 950 and sacrifice child; memory usage 3.98GB/4.0GB",
+      "request_id": "fa33f1cb-49fe-494a-b9ac-750d43507e43",
+      "memory_usage_mb": 3980,
+      "masked_message": "Out of memory: Kill process <NUM> (worker) score <NUM> and sacrifice child; memory usage <NUM>.98GB<PATH>",
+      "ingest_timestamp": 1792633026.9478629
+    }
   }
 ]

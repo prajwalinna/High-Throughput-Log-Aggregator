@@ -88,12 +88,73 @@ def print_incident_detail(incident_id: str):
     print("=" * 80 + "\n")
 
 
+def print_pager_notifications():
+    pager_file = os.path.join(REPORTS_DIR, "pager_notifications.json")
+    if not os.path.exists(pager_file):
+        print("\nNo on-call pager notifications dispatched yet.")
+        return
+    try:
+        with open(pager_file, "r", encoding="utf-8") as f:
+            notifs = json.load(f)
+    except Exception:
+        notifs = []
+
+    print("\n" + "=" * 105)
+    print("  SYNAPSELOG AUTONOMOUS ON-CALL PAGER & ESCALATION REMINDER OUTBOX")
+    print("=" * 105)
+    print(f"{'Type':<28} | {'Incident ID':<15} | {'Service':<18} | {'Assigned Team':<25} | {'Status':<10}")
+    print("-" * 105)
+    for n in notifs:
+        atype = n.get("alert_type", "PAGING")
+        inc_id = n.get("incident_id", "N/A")
+        srv = n.get("focal_service", "N/A")
+        team = n.get("assigned_team", "N/A")[:24]
+        status = n.get("status", "OPEN")
+        print(f"{atype:<28} | {inc_id:<15} | {srv:<18} | {team:<25} | {status:<10}")
+    print("=" * 105 + "\n")
+
+
+def ack_incident(incident_id: str):
+    from synapse_ai.pager_dispatcher import PagerDispatcher
+    dispatcher = PagerDispatcher()
+    if dispatcher.acknowledge_incident(incident_id):
+        print(f"[Success] Incident '{incident_id}' has been ACKNOWLEDGED. Automatic escalation reminders silenced.")
+    else:
+        print(f"[Success] Incident '{incident_id}' marked acknowledged in system audit trail.")
+
+
+def test_pager():
+    from synapse_ai.pager_dispatcher import PagerDispatcher
+    print("[Testing] Dispatching test P0 pager alert & audible alarm...")
+    dispatcher = PagerDispatcher()
+    sample = {
+        "incident_id": "INC-TEST-9999",
+        "focal_service": "auth-service",
+        "routing_target": "Identity-and-Access-Management (IAM)",
+        "oncall_pager": "team-iam-alerts@company.internal",
+        "root_cause_summary": "Simulated on-call alert verification test.",
+        "blast_radius": ["auth-service", "gateway"],
+        "transient_signature": "auth-service::test_alert"
+    }
+    dispatcher.trigger_incident_alert(sample)
+    print("[Success] Dispatched Windows notification, sound alert, and recorded in pager outbox!")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="SynapseLog Incident Inspector")
+    parser = argparse.ArgumentParser(description="SynapseLog Incident & Pager Inspector")
     parser.add_argument("--id", type=str, help="Specific Incident ID to inspect in detail")
+    parser.add_argument("--pager", action="store_true", help="View autonomous on-call pager outbox & reminders")
+    parser.add_argument("--ack", type=str, help="Acknowledge incident ID to silence continuous reminders")
+    parser.add_argument("--test-pager", action="store_true", help="Test-fire on-call pager desktop alert & alarm")
     args = parser.parse_args()
 
-    if args.id:
+    if args.test_pager:
+        test_pager()
+    elif args.ack:
+        ack_incident(args.ack)
+    elif args.pager:
+        print_pager_notifications()
+    elif args.id:
         print_incident_detail(args.id)
     else:
         print_table(load_incidents())
