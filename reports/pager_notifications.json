@@ -587,5 +587,207 @@
     "reminders_sent": 0,
     "last_reminder_time": 1792634188.6909864,
     "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-1008",
+    "timestamp": "2026-10-22T03:19:28Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792639168.9512997,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-2026-1009",
+    "timestamp": "2026-10-22T03:24:42Z",
+    "focal_service": "auth-service",
+    "assigned_team": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792639482.3000767,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "TEST-1",
+    "timestamp": "2026-10-22T03:33:42Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792640022.772746,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "TEST-1",
+    "timestamp": "2026-10-22T03:33:54Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792640034.1801882,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "TEST-1",
+    "timestamp": "2026-10-22T03:35:15Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792640115.5362494,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "TEST-INC-1",
+    "timestamp": "2026-10-22T03:35:21Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792640121.6771088,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "TEST-INC-1",
+    "timestamp": "2026-10-22T03:35:21Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 5,
+    "reminders_sent": 1,
+    "reminders_remaining_before_circuit_break": 2
+  },
+  {
+    "alert_type": "CONTINUOUS_FAILURE_REMINDER",
+    "incident_id": "TEST-INC-1",
+    "timestamp": "2026-10-22T03:35:21Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "ESCALATION_REMINDER",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "ESCALATING",
+    "continuous_failures_intercepted": 10,
+    "reminders_sent": 2,
+    "reminders_remaining_before_circuit_break": 1
+  },
+  {
+    "alert_type": "EMERGENCY_CIRCUIT_BREAKER_TRIPPED",
+    "incident_id": "TEST-INC-1",
+    "timestamp": "2026-10-22T03:35:22Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "EMERGENCY_AUTONOMOUS_INTERVENTION",
+    "root_cause": "Test cause",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "automated_action": "Autonomous Circuit Breaker Tripped! Ingress traffic shed and [auth-service] isolated to protect cluster.",
+    "status": "CIRCUIT_BROKEN_SAFE_FALLBACK",
+    "reminders_ignored": 3
+  },
+  {
+    "alert_type": "INITIAL_INCIDENT_PAGING",
+    "incident_id": "INC-TEST",
+    "timestamp": "2026-10-22T03:36:17Z",
+    "focal_service": "auth-service",
+    "assigned_team": "On-Call SRE",
+    "oncall_pager": "sre-alerts@company.internal",
+    "severity": "CRITICAL_P0",
+    "root_cause": "Test",
+    "blast_radius": [
+      "auth-service"
+    ],
+    "transient_signature": "auth-service::fault",
+    "status": "OPEN",
+    "acknowledged": false,
+    "failure_count": 1,
+    "reminders_sent": 0,
+    "last_reminder_time": 1792640177.7940607,
+    "circuit_breaker_tripped": false
+  },
+  {
+    "alert_type": "CIRCUIT_BREAKER_RESET",
+    "focal_service": "auth-service",
+    "timestamp": "2026-10-22T03:37:44Z",
+    "status": "NORMAL_TRAFFIC_RESTORED"
   }
 ]

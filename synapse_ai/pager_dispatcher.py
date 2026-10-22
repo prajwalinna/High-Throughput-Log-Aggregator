@@ -46,7 +46,7 @@ class PagerDispatcher:
         self.max_reminders_before_circuit_break = max_reminders_before_circuit_break
         self.active_outages: Dict[str, Dict[str, Any]] = {}
         self.tripped_circuits: Dict[str, Dict[str, Any]] = {}
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         os.makedirs(REPORTS_DIR, exist_ok=True)
         self.webhook_url = self._load_webhook_url()
         self._load_config_overrides()
@@ -170,7 +170,8 @@ class PagerDispatcher:
         """
         with self._lock:
             # If circuit breaker already tripped for this service, ignore further reminders
-            if self.is_circuit_tripped(service):
+            cb_status = self.tripped_circuits.get(service)
+            if cb_status and cb_status.get("state") == "TRIPPED":
                 return None
 
             outage = self.active_outages.get(transient_sig)

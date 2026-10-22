@@ -217,5 +217,71 @@
       "masked_message": "Error , databse injecton successful",
       "ingest_timestamp": 1792633913.8813584
     }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1008",
+    "timestamp": "2026-10-22T03:19:28Z",
+    "focal_service": "auth-service",
+    "root_cause_summary": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "routing_target": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "mitigation_steps": [
+      "Enforce Raft term step-down on isolated minority partition nodes",
+      "Quorum fence rogue leader node and trigger unforced reelection on majority partition",
+      "Verify network partition health across internal VPC peering links"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "latency_ms": 16.50839999638265,
+    "log": {
+      "timestamp": "2026-10-22T03:19:28Z",
+      "service": "auth-service",
+      "level": "FATAL",
+      "event": "ZERO_DAY_CONSENSUS_PANIC",
+      "message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "request_id": "36a69989-b45c-4bef-ac9f-ceb909d64315",
+      "response_time_ms": 3000,
+      "masked_message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "ingest_timestamp": 1792639168.9267004
+    }
+  },
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1009",
+    "timestamp": "2026-10-22T03:24:42Z",
+    "focal_service": "auth-service",
+    "root_cause_summary": "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards.",
+    "blast_radius": [
+      "auth-service",
+      "post-service",
+      "gateway"
+    ],
+    "routing_target": "Platform-Core-Infrastructure (Infra & SRE)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "mitigation_steps": [
+      "Enforce Raft term step-down on isolated minority partition nodes",
+      "Quorum fence rogue leader node and trigger unforced reelection on majority partition",
+      "Verify network partition health across internal VPC peering links"
+    ],
+    "transient_signature": "auth-service::raft_consensus_split_brain",
+    "latency_ms": 14.177700002619531,
+    "log": {
+      "timestamp": "2026-10-22T03:24:42Z",
+      "service": "auth-service",
+      "level": "FATAL",
+      "event": "ZERO_DAY_CONSENSUS_PANIC",
+      "message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "request_id": "1c209323-a91d-4776-a009-2532b7645467",
+      "response_time_ms": 3000,
+      "masked_message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "ingest_timestamp": 1792639482.280239
+    }
   }
 ]

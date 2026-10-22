@@ -192,79 +192,82 @@ def run_pipeline():
                 continue
             for tp, msgs in records.items():
                 for msg in msgs:
-                    raw_log = msg.value
-                    if not isinstance(raw_log, dict):
-                        continue
+                    try:
+                        raw_log = msg.value
+                        if not isinstance(raw_log, dict):
+                            continue
 
-                    srv = raw_log.get("service", "unknown")
-                    msg_text = str(raw_log.get("message", "")).strip()
-                    clean_msg = (msg_text[:56] + "...") if len(msg_text) > 59 else msg_text
+                        srv = raw_log.get("service", "unknown")
+                        msg_text = str(raw_log.get("message", "")).strip()
+                        clean_msg = (msg_text[:56] + "...") if len(msg_text) > 59 else msg_text
 
-                    # Autonomous Circuit Breaker Protection:
-                    # If on-call ignored 5 reminders, traffic for this service is automatically shed to protect the cluster
-                    if pager.is_circuit_tripped(srv):
+                        # Autonomous Circuit Breaker Protection:
+                        # If on-call ignored 5 reminders, traffic for this service is automatically shed to protect the cluster
+                        if pager.is_circuit_tripped(srv):
+                            logs_count += 1
+                            pager.record_shed_log(srv)
+                            if logs_count % 5 == 0:
+                                print(f"  Log #{logs_count:04d} | [{srv:18s}] SHED_BY_CIRCUIT_BREAKER     ( 0.003 ms) | Shed: \"{clean_msg}\" (Circuit Breaker Tripped)")
+                            continue
+
                         logs_count += 1
-                        pager.record_shed_log(srv)
-                        if logs_count % 10 == 0:
-                            print(f"  Log #{logs_count:04d} | [{srv:18s}] SHED_BY_CIRCUIT_BREAKER     ( 0.003 ms) | Shed: \"{clean_msg}\" (Circuit Breaker Tripped)")
-                        continue
+                        res = pipeline.process_log(raw_log)
+                        verdict = res["verdict"]
+                        lat = res["latency_ms"]
 
-                    logs_count += 1
-                    res = pipeline.process_log(raw_log)
-                    verdict = res["verdict"]
-                    lat = res["latency_ms"]
+                        if verdict == "ESCALATED_LLM_RCA":
+                            print("\n" + "!" * 75)
+                            print(f"  [TIER-3 GENERATIVE LLM ROOT CAUSE ANALYSIS TRIGGERED]")
+                            print(f"  Incident ID       : {res['incident_id']}")
+                            print(f"  Focal Service     : {srv}")
+                            print(f"  Root Cause        : {res['root_cause_summary']}")
+                            print(f"  Trigger Message   : \"{msg_text}\"")
+                            print(f"  Blast Radius      : {res['blast_radius']}")
+                            print(f"  Assigned Team     : {res['routing_target']} (Pager: {res['oncall_pager']})")
+                            print(f"  Mitigation Action : {res['mitigation_steps'][0]}")
+                            print(f"  Transient Sig     : {res['transient_signature']}")
+                            print(f"  Tier-4 Action     : Injected Bloom suppression (Duplicate filter active)!")
+                            print("!" * 75 + "\n")
+                            log_incident_report(res)
+                            pager.trigger_incident_alert(res)
 
-                    if verdict == "ESCALATED_LLM_RCA":
-                        print("\n" + "!" * 75)
-                        print(f"  [TIER-3 GENERATIVE LLM ROOT CAUSE ANALYSIS TRIGGERED]")
-                        print(f"  Incident ID       : {res['incident_id']}")
-                        print(f"  Focal Service     : {srv}")
-                        print(f"  Root Cause        : {res['root_cause_summary']}")
-                        print(f"  Trigger Message   : \"{msg_text}\"")
-                        print(f"  Blast Radius      : {res['blast_radius']}")
-                        print(f"  Assigned Team     : {res['routing_target']} (Pager: {res['oncall_pager']})")
-                        print(f"  Mitigation Action : {res['mitigation_steps'][0]}")
-                        print(f"  Transient Sig     : {res['transient_signature']}")
-                        print(f"  Tier-4 Action     : Injected Bloom suppression (Duplicate filter active)!")
-                        print("!" * 75 + "\n")
-                        log_incident_report(res)
-                        pager.trigger_incident_alert(res)
+                        elif verdict == "SUPPRESSED_ONGOING_INCIDENT":
+                            if logs_count % 3 == 0:
+                                print(f"  Log #{logs_count:04d} | [{srv:18s}] SUPPRESSED_ONGOING_INCIDENT ({lat:6.3f} ms) | Intercepted: \"{clean_msg}\"")
+                            
+                            # Continuous Failure Tracking & Autonomous Circuit Breaker (trips after 5 ignored reminders)
+                            rem = pager.record_suppressed_failure(srv, res.get("transient_signature", f"{srv}::fault"))
+                            if rem:
+                                if rem.get("alert_type") == "EMERGENCY_CIRCUIT_BREAKER_TRIPPED":
+                                    print("\n" + "=" * 75)
+                                    print("  🚨 [AUTONOMOUS CIRCUIT BREAKER ACTIVATED: 5 UNANSWERED REMINDERS]")
+                                    print(f"  Focal Service     : {rem['focal_service']}")
+                                    print(f"  Incident ID       : {rem['incident_id']}")
+                                    print(f"  Automated Action  : Ingress traffic shed and isolated to halt cluster collapse!")
+                                    print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
+                                    print(f"  Recovery Command  : Run 'python view_incidents.py --reset-circuit {rem['focal_service']}' to restore")
+                                    print("=" * 75 + "\n")
+                                else:
+                                    rem_left = rem.get("reminders_remaining_before_circuit_break", 0)
+                                    print("\n" + "#" * 75)
+                                    print(f"  🔔 [CONTINUOUS OUTAGE ESCALATION REMINDER #{rem['reminders_sent']} SENT]")
+                                    print(f"  Incident ID       : {rem['incident_id']}")
+                                    print(f"  Focal Service     : {rem['focal_service']}")
+                                    print(f"  Outage Duration   : {rem['continuous_failures_intercepted']} consecutive failure logs intercepted!")
+                                    print(f"  Circuit Breaker   : {rem_left} reminders remaining before automatic service isolation!")
+                                    print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
+                                    print("#" * 75 + "\n")
 
-                    elif verdict == "SUPPRESSED_ONGOING_INCIDENT":
-                        if logs_count % 5 == 0:
-                            print(f"  Log #{logs_count:04d} | [{srv:18s}] SUPPRESSED_ONGOING_INCIDENT ({lat:6.3f} ms) | Intercepted: \"{clean_msg}\"")
-                        
-                        # Continuous Failure Tracking & Autonomous Circuit Breaker (trips after 5 ignored reminders)
-                        rem = pager.record_suppressed_failure(srv, res.get("transient_signature", f"{srv}::fault"))
-                        if rem:
-                            if rem.get("alert_type") == "EMERGENCY_CIRCUIT_BREAKER_TRIPPED":
-                                print("\n" + "=" * 75)
-                                print("  🚨 [AUTONOMOUS CIRCUIT BREAKER ACTIVATED: 5 UNANSWERED REMINDERS]")
-                                print(f"  Focal Service     : {rem['focal_service']}")
-                                print(f"  Incident ID       : {rem['incident_id']}")
-                                print(f"  Automated Action  : Ingress traffic shed and isolated to halt cluster collapse!")
-                                print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
-                                print(f"  Recovery Command  : Run 'python view_incidents.py --reset-circuit {rem['focal_service']}' to restore")
-                                print("=" * 75 + "\n")
-                            else:
-                                rem_left = rem.get("reminders_remaining_before_circuit_break", 0)
-                                print("\n" + "#" * 75)
-                                print(f"  🔔 [CONTINUOUS OUTAGE ESCALATION REMINDER #{rem['reminders_sent']} SENT]")
-                                print(f"  Incident ID       : {rem['incident_id']}")
-                                print(f"  Focal Service     : {rem['focal_service']}")
-                                print(f"  Outage Duration   : {rem['continuous_failures_intercepted']} consecutive failure logs intercepted!")
-                                print(f"  Circuit Breaker   : {rem_left} reminders remaining before automatic service isolation!")
-                                print(f"  Assigned Team     : {rem['assigned_team']} (Pager: {rem['oncall_pager']})")
-                                print("#" * 75 + "\n")
+                        elif verdict == "RESOLVED_BY_SLM_LOCALLY":
+                            pred = res.get("predicted_class", "KNOWN_FAULT")
+                            conf = res.get("confidence", 0.0) * 100
+                            print(f"  Log #{logs_count:04d} | [{srv:18s}] RESOLVED_BY_SLM_LOCALLY    ({lat:6.3f} ms) | Solved: \"{clean_msg}\" [{pred} {conf:.1f}%]")
 
-                    elif verdict == "RESOLVED_BY_SLM_LOCALLY":
-                        pred = res.get("predicted_class", "KNOWN_FAULT")
-                        conf = res.get("confidence", 0.0) * 100
-                        print(f"  Log #{logs_count:04d} | [{srv:18s}] RESOLVED_BY_SLM_LOCALLY    ({lat:6.3f} ms) | Solved: \"{clean_msg}\" [{pred} {conf:.1f}%]")
-
-                    else: # PASS_TO_ARCHIVE
-                        if logs_count % 10 == 0:
-                            print(f"  Log #{logs_count:04d} | [{srv:18s}] PASS_TO_ARCHIVE             ({lat:6.3f} ms) | Event: \"{clean_msg}\"")
+                        else: # PASS_TO_ARCHIVE
+                            if logs_count % 10 == 0:
+                                print(f"  Log #{logs_count:04d} | [{srv:18s}] PASS_TO_ARCHIVE             ({lat:6.3f} ms) | Event: \"{clean_msg}\"")
+                    except Exception as err:
+                        print(f"  [Pipeline Processing Error] {err}")
 
             # Periodic Status Banner every 12 seconds
             now = time.time()

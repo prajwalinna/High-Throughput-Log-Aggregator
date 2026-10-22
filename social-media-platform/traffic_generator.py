@@ -50,6 +50,15 @@ class MicroserviceTrafficEngine:
             else:
                 handler._write_to_fallback(log_entry)
 
+    def flush(self):
+        """Flushes buffered Kafka logs across all service producers."""
+        for h in self.handlers.values():
+            if getattr(h, "producer", None):
+                try:
+                    h.producer.flush()
+                except Exception:
+                    pass
+
     def generate_normal_cycle(self, count: int = 100, delay_sec: float = 0.02):
         """Generates sustained normal operational traffic silently."""
         for i in range(count):
@@ -83,6 +92,7 @@ class MicroserviceTrafficEngine:
             self.emit_log(srv, "INFO", event, template, extra)
             if delay_sec > 0:
                 time.sleep(delay_sec)
+        self.flush()
 
     def inject_incident_burst(self, incident_type: str, burst_count: int = 30):
         """Simulates an ongoing outage storm."""
@@ -121,6 +131,7 @@ class MicroserviceTrafficEngine:
             }
             self.emit_log(srv, level, event, msg, extra)
             time.sleep(0.01) # Rapid burst
+        self.flush()
 
 
 def main():
