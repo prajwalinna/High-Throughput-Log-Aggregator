@@ -91,8 +91,8 @@ class PagerDispatcher:
         try:
             with open(CIRCUIT_FILE, "w", encoding="utf-8") as f:
                 json.dump(self.tripped_circuits, f, indent=2)
-            except Exception:
-                pass
+        except Exception:
+            pass
 
     def is_circuit_tripped(self, service: str) -> bool:
         """Checks if autonomous circuit breaker is active for a service."""
