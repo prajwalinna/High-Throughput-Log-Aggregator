@@ -9,7 +9,7 @@ Produces empirical results for Paper Research Questions (RQ1 - RQ5).
 import os
 import re
 import time
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import numpy as np
 
 from synapse_ai.pipeline_orchestrator import SynapsePipeline
@@ -48,14 +48,51 @@ def parse_bgl_line(line: str) -> Dict[str, Any]:
     }
 
 
-def run_bgl_benchmark(dataset_path: str = "evaluation_BGL_2k.log", sample_size: int = 1000):
+def find_bgl_dataset(dataset_path: Optional[str] = None) -> str:
+    """
+    Auto-discovers the LogHub BGL dataset across standard locations,
+    or downloads it on demand if missing.
+    """
+    if dataset_path and os.path.exists(dataset_path):
+        return dataset_path
+    
+    candidates = [
+        os.path.join("evaluation", "datasets", "BGL_2k.log"),
+        "evaluation_BGL_2k.log",
+        "BGL_2k.log",
+        os.path.join("evaluation", "BGL_2k.log")
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+            
+    # Auto-fetch if missing
+    import urllib.request
+    save_path = os.path.join("evaluation", "datasets", "BGL_2k.log")
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    try:
+        print("[Dataset] Auto-fetching BGL_2k.log benchmark dataset from LogHub...")
+        urllib.request.urlretrieve(
+            "https://raw.githubusercontent.com/logpai/loghub/master/BGL/BGL_2k.log",
+            save_path
+        )
+        return save_path
+    except Exception as e:
+        print(f"[Dataset] Warning: Unable to auto-download dataset: {e}")
+        return candidates[0]
+
+
+def run_bgl_benchmark(dataset_path: Optional[str] = None, sample_size: int = 1000):
     print("\n" + "=" * 70)
     print("  RUNNING SYNAPSELOG BENCHMARK ON LOGHUB BGL (Blue Gene/L Supercomputer)")
     print("=" * 70)
     
-    if not os.path.exists(dataset_path):
-        print(f"Error: Dataset not found at {dataset_path}")
+    resolved_path = find_bgl_dataset(dataset_path)
+    if not os.path.exists(resolved_path):
+        print(f"Error: Dataset not found at {resolved_path}")
         return
+
+    dataset_path = resolved_path
 
     # Initialize Pipeline on NVIDIA RTX 2050 GPU (CUDA)
     pipeline = SynapsePipeline(device="cuda", tau_confident=0.65)

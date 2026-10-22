@@ -17,6 +17,7 @@ venv/
 # Docker & Temporary Data
 floci-data/
 *.log
+!evaluation/datasets/*.log
 social-media-platform/logs/
 
 # IDE & OS

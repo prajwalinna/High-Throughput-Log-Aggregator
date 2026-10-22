@@ -19,7 +19,7 @@ docker rm -f kafka floci loki grafana storage-consumer analysis-consumer s3-cons
 # 2. Clean temporary fallback logs
 Write-Host "[2/4] Removing temporary log files..." -ForegroundColor Yellow
 Remove-Item -Path "social-media-platform\logs\*" -Force -Recurse 2>$null
-Remove-Item -Path "*.log" -Force 2>$null
+Remove-Item -Path "reports\incident_audit.log" -Force 2>$null
 
 # 3. Clean Python bytecode
 Write-Host "[3/4] Cleaning Python bytecode caches..." -ForegroundColor Yellow

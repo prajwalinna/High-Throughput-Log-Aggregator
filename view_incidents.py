@@ -42,8 +42,8 @@ def print_table(incidents: List[Dict[str, Any]]):
 
     for inc in incidents:
         inc_id = inc.get("incident_id", "N/A")
-        ts = inc.get("timestamp", "N/A")[:19]
-        srv = inc.get("focal_service", "N/A")
+        ts = str(inc.get("timestamp") or inc.get("log", {}).get("timestamp", "N/A"))[:19]
+        srv = str(inc.get("focal_service") or inc.get("log", {}).get("service", "N/A"))
         team = inc.get("routing_target", "N/A")
         print(f"{inc_id:<15} | {ts:<20} | {srv:<18} | {team:<25}")
 
@@ -68,8 +68,10 @@ def print_incident_detail(incident_id: str):
     print("\n" + "=" * 80)
     print(f"  DETAILED CAUSAL ROOT CAUSE DOSSIER: {incident_id}")
     print("=" * 80)
-    print(f"Timestamp           : {target.get('timestamp')}")
-    print(f"Focal Microservice  : {target.get('focal_service')}")
+    ts = target.get('timestamp') or target.get('log', {}).get('timestamp', 'N/A')
+    srv = target.get('focal_service') or target.get('log', {}).get('service', 'N/A')
+    print(f"Timestamp           : {ts}")
+    print(f"Focal Microservice  : {srv}")
     print(f"Assigned Team       : {target.get('routing_target')} (Pager: {target.get('oncall_pager')})")
     print(f"Blast Radius        : {target.get('blast_radius')}")
     print(f"Transient Signature : {target.get('transient_signature')}")

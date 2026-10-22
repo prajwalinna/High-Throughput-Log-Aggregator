@@ -94,7 +94,8 @@ class GenerativeLLMReasoner:
         self,
         service: str,
         window: Optional[SessionWindow],
-        tier2_metadata: Dict[str, Any]
+        tier2_metadata: Dict[str, Any],
+        trigger_log: Optional[str] = None
     ) -> Dict[str, Any]:
         t0 = time.perf_counter()
         dossier = self.assembler.assemble_dossier(service, window, tier2_metadata)
@@ -102,10 +103,28 @@ class GenerativeLLMReasoner:
         self._incident_counter += 1
         inc_id = f"INC-2026-{self._incident_counter}"
 
-        # Analyze failure signature from logs
-        logs_text = " ".join(dossier["recent_focal_logs"]).lower()
+        # Determine trigger message (highest causal fidelity)
+        target_msg = (
+            trigger_log
+            or tier2_metadata.get("trigger_log")
+            or (dossier["recent_focal_logs"][-1] if dossier["recent_focal_logs"] else "")
+        ).lower()
+        logs_text = (" ".join(dossier["recent_focal_logs"]) + " " + target_msg).lower()
         
-        if "database" in logs_text or "connection" in logs_text:
+        # Priority 1: Zero-Day Distributed Raft / Consensus Partition
+        if any(k in target_msg for k in ["raft", "consensus", "split-brain", "quorum", "deadlock", "election"]):
+            root_cause = "Distributed Raft consensus partition and quorum loss leading to leader election failure and circular wait deadlock across cluster shards."
+            blast_radius = [service, "post-service", "gateway"]
+            mitigation = [
+                "Enforce Raft term step-down on isolated minority partition nodes",
+                "Quorum fence rogue leader node and trigger unforced reelection on majority partition",
+                "Verify network partition health across internal VPC peering links"
+            ]
+            assigned_team = "Platform-Core-Infrastructure (Infra & SRE)"
+            transient_sig = f"{service}::raft_consensus_split_brain"
+
+        # Priority 2: Database Connection Pool Exhaustion
+        elif any(k in target_msg for k in ["database", "connection pool", "pool exhausted", "postgres", "max_connections"]) or ("database" in logs_text and "pool" in logs_text):
             root_cause = "Database connection pool exhaustion on primary PostgreSQL cluster, causing auth worker threads to block."
             blast_radius = [service, "post-service", "gateway"]
             mitigation = [
@@ -114,16 +133,9 @@ class GenerativeLLMReasoner:
             ]
             assigned_team = dossier["service_team"]
             transient_sig = f"{service}::db_pool_exhaustion"
-        elif "timeout" in logs_text or "token" in logs_text:
-            root_cause = "JWT token generation cryptographic provider timeout under burst authentication load."
-            blast_radius = [service, "gateway"]
-            mitigation = [
-                "Enable Redis JWKS key caching layer",
-                "Temporarily increase read timeout SLA on API Gateway to 1500ms"
-            ]
-            assigned_team = dossier["service_team"]
-            transient_sig = f"{service}::jwt_crypto_timeout"
-        elif "memory" in logs_text or "oom" in logs_text:
+
+        # Priority 3: Out-Of-Memory (OOM) Buffer Exhaustion
+        elif any(k in target_msg for k in ["memory", "oom", "heap", "out of memory", "leak"]) or ("oom" in logs_text):
             root_cause = "Out-Of-Memory (OOM) killer invoked due to memory leak in image transcoding buffer."
             blast_radius = [service]
             mitigation = [
@@ -132,6 +144,29 @@ class GenerativeLLMReasoner:
             ]
             assigned_team = dossier["service_team"]
             transient_sig = f"{service}::oom_leak"
+
+        # Priority 4: Cryptographic Token / Auth Provider Timeout
+        elif any(k in target_msg for k in ["jwt", "token", "crypto", "jwks", "signature"]):
+            root_cause = "JWT token generation cryptographic provider timeout under burst authentication load."
+            blast_radius = [service, "gateway"]
+            mitigation = [
+                "Enable Redis JWKS key caching layer",
+                "Temporarily increase read timeout SLA on API Gateway to 1500ms"
+            ]
+            assigned_team = dossier["service_team"]
+            transient_sig = f"{service}::jwt_crypto_timeout"
+
+        # Priority 5: Upstream RPC Timeout Degradation
+        elif any(k in target_msg for k in ["timeout", "timed out", "upstream"]) or ("timeout" in logs_text):
+            root_cause = f"Cascading upstream timeout and latency degradation affecting {service}."
+            blast_radius = [service] + dossier["dependencies"]
+            mitigation = [
+                "Activate circuit breaker on upstream RPC client calls",
+                "Scale backend read replicas to alleviate request queuing"
+            ]
+            assigned_team = dossier["service_team"]
+            transient_sig = f"{service}::upstream_timeout"
+
         else:
             root_cause = f"Cascading dependency degradation affecting {service} causing unexpected log rate elevation."
             blast_radius = [service] + dossier["dependencies"]

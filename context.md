@@ -28,11 +28,11 @@ SynapseLog is validated against both canonical academic benchmarks and a real-wo
 1. **LogHub BGL (Blue Gene/L Supercomputer):**
    * **Source:** Lawrence Livermore National Laboratory (LLNL), hosted in the official LogPAI repository.
    * **Characteristics:** Over 4.7 million raw logs from an HPC supercomputer with 131,072 processors. Contains hardware failure tags and operator RAS alerts (ground-truth labels: `-` for normal, alert category strings for anomalies).
-   * **Local File:** `evaluation_BGL_2k.log`
+   * **Stored Path:** `evaluation/datasets/BGL_2k.log` (with automatic fallback to `evaluation_BGL_2k.log`)
 2. **LogHub HDFS (Hadoop Distributed File System):**
    * **Source:** Amazon EC2 Hadoop clusters running map-reduce workloads.
    * **Characteristics:** 11.1 million logs sessionized by Hadoop Block IDs (`blk_*`), standard benchmark for sequence anomalies.
-   * **Local File:** `evaluation_HDFS_2k.log`
+   * **Stored Path:** `evaluation/datasets/HDFS_2k.log` (with automatic fallback to `evaluation_HDFS_2k.log`)
 3. **Synthetic Multi-Service Microservice Telemetry (Platform Testbed):**
    * **Architecture:** Three interconnected services (`auth-service`, `post-service`, and `notification-service`).
    * **Injected Outages:** Database connection pool exhaustion, authentication timeouts, cascading retry storms, and memory leaks.
@@ -158,3 +158,16 @@ To target top-tier venues (USENIX ATC, ACM CCS, ICSE, FSE, IEEE S&P), the paper 
 * **RQ3 (Epistemic Calibration & Cost Efficiency):** Does conformal epistemic gating accurately route only truly ambiguous cases, achieving $> 99\%$ reduction in LLM token expenditures?
 * **RQ4 (RCA & Routing Quality):** How accurately does the topology-augmented dossier prevent LLM hallucinations and correctly dispatch to the responsible engineering team?
 * **RQ5 (Ablation & Distillation Velocity):** How effectively does the Tier-4 closed-loop feedback loop suppress repetitive alert storms during ongoing outages?
+
+---
+
+## 8. Recent Engineering Refinements & Quality Hardening
+
+1. **Benchmark Dataset Auto-Discovery & Teardown Protection:**
+   * Benchmark datasets are now isolated in `evaluation/datasets/` (`BGL_2k.log` and `HDFS_2k.log`), tracked via `.gitignore` exception `!evaluation/datasets/*.log`, and auto-discovered with on-demand fallback downloading across all evaluation tools (`benchmark_runner.py` and `train_slm.py`).
+   * `clean_all.bat` and `clean_all.ps1` were updated to remove indiscriminate `*.log` deletions, ensuring benchmark ground truth is never lost when stopping Docker containers.
+2. **Causal RCA Precision & Trigger Priority:**
+   * Updated `synapse_ai/tier3_llm_rca.py` and `synapse_ai/pipeline_orchestrator.py` to prioritize the exact `trigger_log` over background session noise.
+   * Novel Zero-Day faults (such as Raft consensus partition / quorum split-brain) are now cleanly isolated and assigned to `Platform-Core-Infrastructure (Infra & SRE)`, while database connection pool exhaustion is dispatched to the database SRE team with dedicated PgBouncer scaling actions.
+3. **Incident Audit Inspector (`view_incidents.py`):**
+   * Enhanced with flexible dictionary key fallbacks so all diagnosed incidents display exact timestamps, focal services, blast radiuses, and mitigation steps both in the summary table and single-incident deep-dive view (`python view_incidents.py --id <INC_ID>`).

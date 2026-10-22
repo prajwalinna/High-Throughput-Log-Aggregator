@@ -1,0 +1,31 @@
+[
+  {
+    "verdict": "ESCALATED_LLM_RCA",
+    "tier": 3,
+    "incident_id": "INC-2026-1001",
+    "root_cause_summary": "JWT token generation cryptographic provider timeout under burst authentication load.",
+    "blast_radius": [
+      "auth-service",
+      "gateway"
+    ],
+    "routing_target": "Identity-and-Access-Management (IAM)",
+    "oncall_pager": "team-iam-alerts@company.internal",
+    "mitigation_steps": [
+      "Enable Redis JWKS key caching layer",
+      "Temporarily increase read timeout SLA on API Gateway to 1500ms"
+    ],
+    "transient_signature": "auth-service::jwt_crypto_timeout",
+    "latency_ms": 18.381800000497606,
+    "log": {
+      "timestamp": "2026-10-22T01:18:04Z",
+      "service": "auth-service",
+      "level": "FATAL",
+      "event": "ZERO_DAY_CONSENSUS_PANIC",
+      "message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "request_id": "f5ffc00f-11b4-444e-b2e0-cb7f3a2dea4a",
+      "response_time_ms": 3000,
+      "masked_message": "Distributed Raft quorum partition: fatal split-brain deadlock on auth_shard_0; circular wait panic",
+      "ingest_timestamp": 1792631884.2559872
+    }
+  }
+]

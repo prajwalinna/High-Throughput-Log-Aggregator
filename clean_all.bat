@@ -22,7 +22,6 @@ echo [2/4] Removing temporary runtime logs...
 if exist "social-media-platform\logs" (
     del /q /f "social-media-platform\logs\*.*" >nul 2>&1
 )
-del /q /f "*.log" >nul 2>&1
 del /q /f "reports\incident_audit.log" >nul 2>&1
 
 :: 3. Remove Python caches

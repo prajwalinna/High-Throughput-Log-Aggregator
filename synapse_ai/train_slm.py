@@ -8,6 +8,7 @@ Produces calibrated logits so normal sequences have low epistemic uncertainty U(
 
 import os
 import time
+from typing import Optional
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
@@ -43,15 +44,21 @@ class LogDataset(Dataset):
 
 
 def train_calibrated_slm(
-    dataset_path: str = "evaluation_BGL_2k.log",
+    dataset_path: Optional[str] = None,
     output_dir: str = "models/tier2_slm_calibrated",
     epochs: int = 3,
     batch_size: int = 16,
     lr: float = 3e-5
 ):
     print("=" * 65)
-    print("  TRAINING / CALIBRATING TIER-2 SLM (DistilBERT) ON RTX 2050 CUDA")
+    print("  TRAINING / CALIBRATING TIER-2 SLM (DistilBERT) ON CUDA")
     print("=" * 65)
+
+    if dataset_path is None or not os.path.exists(dataset_path):
+        for candidate in ["evaluation/datasets/BGL_2k.log", "evaluation_BGL_2k.log", "BGL_2k.log"]:
+            if os.path.exists(candidate):
+                dataset_path = candidate
+                break
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Device: {device} ({torch.cuda.get_device_name(0) if device == 'cuda' else 'CPU'})")

@@ -141,7 +141,12 @@ class SynapsePipeline:
         service = enriched_log.get("service", "unknown-service")
         current_window = self.sessionizer.windows.get(service)
         
-        diagnosis = self.tier3.analyze_incident(service, current_window, t2_eval)
+        diagnosis = self.tier3.analyze_incident(
+            service=service,
+            window=current_window,
+            tier2_metadata=t2_eval,
+            trigger_log=enriched_log.get("message", "")
+        )
 
         # Step 4: Tier-4 Active Distillation Loop
         # Register diagnosis in Tier-4 to suppress future duplicate logs during this outage
@@ -154,6 +159,8 @@ class SynapsePipeline:
             "verdict": "ESCALATED_LLM_RCA",
             "tier": 3,
             "incident_id": diagnosis["incident_id"],
+            "timestamp": diagnosis.get("timestamp", enriched_log.get("timestamp")),
+            "focal_service": diagnosis.get("focal_service", service),
             "root_cause_summary": diagnosis["root_cause_summary"],
             "blast_radius": diagnosis["blast_radius"],
             "routing_target": diagnosis["routing_target"],
