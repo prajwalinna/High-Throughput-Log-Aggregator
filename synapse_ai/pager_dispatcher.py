@@ -39,11 +39,13 @@ class PagerDispatcher:
         self,
         reminder_interval_logs: int = 40,
         reminder_cooldown_sec: float = 30.0,
-        max_reminders_before_circuit_break: int = 5
+        max_reminders_before_circuit_break: int = 5,
+        enable_circuit_breaker: bool = False  # Disabled as requested by user
     ):
         self.reminder_interval_logs = reminder_interval_logs
         self.reminder_cooldown_sec = reminder_cooldown_sec
         self.max_reminders_before_circuit_break = max_reminders_before_circuit_break
+        self.enable_circuit_breaker = enable_circuit_breaker
         self.active_outages: Dict[str, Dict[str, Any]] = {}
         self.tripped_circuits: Dict[str, Dict[str, Any]] = {}
         self._lock = threading.RLock()
@@ -89,11 +91,13 @@ class PagerDispatcher:
         try:
             with open(CIRCUIT_FILE, "w", encoding="utf-8") as f:
                 json.dump(self.tripped_circuits, f, indent=2)
-        except Exception:
-            pass
+            except Exception:
+                pass
 
     def is_circuit_tripped(self, service: str) -> bool:
         """Checks if autonomous circuit breaker is active for a service."""
+        if not self.enable_circuit_breaker:
+            return False
         with self._lock:
             status = self.tripped_circuits.get(service)
             return bool(status and status.get("state") == "TRIPPED")
@@ -195,8 +199,8 @@ class PagerDispatcher:
                 outage["last_reminder_time"] = now
 
                 # AUTONOMOUS CIRCUIT BREAKER THRESHOLD CHECK:
-                # If on-call engineer has ignored max_reminders (default: 5), TRIP CIRCUIT BREAKER!
-                if outage["reminders_sent"] >= self.max_reminders_before_circuit_break and not outage.get("circuit_breaker_tripped"):
+                # If enabled and on-call engineer has ignored max_reminders, TRIP CIRCUIT BREAKER!
+                if self.enable_circuit_breaker and (outage["reminders_sent"] >= self.max_reminders_before_circuit_break) and not outage.get("circuit_breaker_tripped"):
                     return self._activate_circuit_breaker(outage, service)
 
                 reminder_record = {
